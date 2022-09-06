@@ -91,9 +91,11 @@ public class UserInfoController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         TokenDto jwt = jwtTokenProvider.createToken(authentication);
-        resHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
-        return new ResponseEntity<>(new TokenDto(), resHeaders,  HttpStatus.OK);
+        //Bearer에 accessToken만 있어도 되는지 여부 확인. 사실상 refreshToken은 accessToken을 재발급 받기 위한 것이라
+        resHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " +jwt.getAccessToken());
+        return new ResponseEntity<>(jwt, resHeaders,  HttpStatus.OK);
     }
+
 
     @RequestMapping(value = "/{userNickname}",
             method = {RequestMethod.GET, RequestMethod.POST}

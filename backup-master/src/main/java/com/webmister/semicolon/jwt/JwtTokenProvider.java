@@ -1,5 +1,6 @@
 package com.webmister.semicolon.jwt;
 
+import com.webmister.semicolon.domain.RefreshToken;
 import com.webmister.semicolon.dto.TokenDto;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -53,28 +54,28 @@ public class JwtTokenProvider implements InitializingBean {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
 
-        //.signWith(key,)에서 key를 accessKey랑 refreshKey로 나누어야 할듯.
+        //.signWith(key,)에서 key를 accessKey랑 refreshKey로 나누어야 하나.
 
         Date now = new Date();
-
 
         String accessToken = Jwts.builder()
                 .setSubject(authentication.getName())
                 .claim(AUTHORITIES_KEY, authorities)
                 .signWith(key, SignatureAlgorithm.HS512)
-                .setExpiration(new Date(now.getTime()+accessTokenValidityInMilliseconds))
+                .setExpiration(new Date(now.getTime() +accessTokenValidityInMilliseconds))
                 .compact();
 
         String refreshToken = Jwts.builder()
                 .setSubject(authentication.getName())
                 .claim(AUTHORITIES_KEY, authorities)
                 .signWith(key, SignatureAlgorithm.HS512)
-                .setExpiration(new Date(now.getTime()+refreshTokenValidityInMilliseconds))
+                .setExpiration(new Date(now.getTime() +refreshTokenValidityInMilliseconds))
                 .compact();
 
         return TokenDto.builder().accessToken(accessToken).refreshToken(refreshToken).build();
     }
 
+    // JWT 토큰에서 인증 정보 조회
     public Authentication getAuthentication(String token) {
         Claims claims = Jwts
                 .parserBuilder()
@@ -107,5 +108,43 @@ public class JwtTokenProvider implements InitializingBean {
             logger.info("JWT 토큰이 잘못되었습니다.");
         }
         return false;
+    }
+
+    public String validateRefreshToken(RefreshToken refreshTokenObj){
+
+            String refreshToken = refreshTokenObj.getRefreshToken();
+
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(refreshToken);
+        try{
+            // refresh 토큰 만료가 안됬으면 새로운 access 토큰 생성.
+            // if(!Jwts..before(new Date())){}
+            // return reCreateToken();
+        }
+        catch (Exception e){
+            // refresh 토큰이 만료된 경우, 로그인이 필요.
+            logger.info("로그인 필요");
+            return null;
+        }
+        return null;
+    }
+
+    //refresh 유효성 검사 거치고 accessToken 새로 발급하는 메서드.
+    public String reCreateToken(Authentication authentication) {
+
+        String authorities = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
+
+        long now = (new Date()).getTime();
+        Date validity = new Date(now + this.accessTokenValidityInMilliseconds);
+
+        String accessToken = Jwts.builder()
+                .setSubject(authentication.getName())
+                .claim(AUTHORITIES_KEY, authorities)
+                .signWith(key, SignatureAlgorithm.HS512)
+                .setExpiration(validity)
+                .compact();
+
+        return accessToken;
     }
 }
