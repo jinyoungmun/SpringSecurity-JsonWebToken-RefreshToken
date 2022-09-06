@@ -64,13 +64,12 @@ public class SecurityConfig {
 
                 .and()
                 .authorizeRequests()
+                .antMatchers("/api/signUp").permitAll()
+                .antMatchers("/api/login").permitAll()
                 .antMatchers("/api/printAll").permitAll()
-                //.hasRole("USER")
                 //.access("hasAnyRole('임시','임시1')")
                 .antMatchers("/api/get").permitAll()
-                .antMatchers("/api/{userNickname}").permitAll()
-                .antMatchers("/api/login").permitAll()
-                .antMatchers("/api/**").permitAll()
+                .antMatchers("/api/{userNickname}").hasRole("USER")
 
                 .anyRequest().authenticated()
 
