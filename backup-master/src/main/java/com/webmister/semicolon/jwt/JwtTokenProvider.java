@@ -114,15 +114,16 @@ public class JwtTokenProvider implements InitializingBean {
 
             String refreshToken = refreshTokenObj.getRefreshToken();
 
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(refreshToken);
         try{
+            Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(refreshToken);
             // refresh 토큰 만료가 안됬으면 새로운 access 토큰 생성.
-            // if(!Jwts..before(new Date())){}
-            // return reCreateToken();
+            if(!claims.getBody().getExpiration().before(new Date())){
+                //return reCreateToken(claims.getBody().get().toString(), claims.getBody().get());
+            }
         }
         catch (Exception e){
             // refresh 토큰이 만료된 경우, 로그인이 필요.
-            logger.info("로그인 필요");
+            logger.info("재로그인 필요");
             return null;
         }
         return null;

@@ -17,8 +17,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class ReportController {
-    @Autowired
-    ReportService reportService;
+    final ReportService reportService;
+
+    public ReportController(ReportService reportService){
+        this.reportService = reportService;
+    }
 
     @PostMapping("/reportUpload")
     public ResponseEntity<Boolean> reportUpload(@RequestBody UploadRequest uploadRequest){
