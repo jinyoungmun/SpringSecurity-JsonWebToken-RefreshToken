@@ -21,11 +21,11 @@ public class UserInfoService {
     private final PasswordEncoder passwordEncoder;
 
     public UserInfoService
-    (
-            UserInfoRepository userInfoRepository,
-            AuthorityRepository authorityRepository,
-            PasswordEncoder passwordEncoder
-    )
+            (
+                    UserInfoRepository userInfoRepository,
+                    AuthorityRepository authorityRepository,
+                    PasswordEncoder passwordEncoder
+            )
     {
         this.userInfoRepository = userInfoRepository;
         this.authorityRepository = authorityRepository;
@@ -33,7 +33,7 @@ public class UserInfoService {
     }
 
     public UserInfo findUserInfoById(Long id){
-      return userInfoRepository.findById(id).orElse(new UserInfo());
+        return userInfoRepository.findById(id).orElse(new UserInfo());
     }
 
     public UserInfo findUserInfoByUserNickname(String userNickname){
@@ -54,18 +54,18 @@ public class UserInfoService {
         return userInfoRepository.existsByUserNickName(userNickname);
     }
 
-   public UserInfo login(Login login) {
+    public UserInfo login(Login login) {
         log.info("서비스 로그인");
         return userInfoRepository.findByUserEmailAndPassword(login.getUserEmail(), login.getPassword())
                 .orElse(new UserInfo());
-   }
+    }
 
-   public UserInfo updatePasswordService(String email, String password) {
+    public UserInfo updatePasswordService(String email, String password) {
         UserInfo userInfo = userInfoRepository.findByUserEmail(email)
                 .orElse(new UserInfo());
         userInfoRepository.save(userInfo.setPassword(password));
         return userInfo;
-   }
+    }
 
     public Boolean signUp(UserInfoRequest userInfoRequest) {
 

@@ -54,7 +54,6 @@ public class JwtTokenProvider implements InitializingBean {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
 
-        //.signWith(key,)에서 key를 accessKey랑 refreshKey로 나누어야 하나.
 
         Date now = new Date();
 
@@ -110,15 +109,39 @@ public class JwtTokenProvider implements InitializingBean {
         return false;
     }
 
+//    public boolean validateRefreshToken(RefreshToken refreshTokenObj){
+//
+//        String refreshToken = refreshTokenObj.getRefreshToken();
+//
+//        try{
+//            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(refreshToken);
+//            if(!Jwts.claims().getExpiration().before(new Date())){
+//                return reCreateToken();
+//            }
+//            return true;
+//        }
+//        catch(SignatureException | MalformedJwtException e){
+//            // 서명 오류, JWT 구조 문제
+//            log.info("");
+//        }
+//        catch (ExpiredJwtException e){
+//            log.info("재로그인 필요");
+//        }
+//        catch (Exception e){
+//            // 그 이외의 오류
+//        }
+//        return false; // false면 401에러.
+//    }
+
     public String validateRefreshToken(RefreshToken refreshTokenObj){
 
-            String refreshToken = refreshTokenObj.getRefreshToken();
+        String refreshToken = refreshTokenObj.getRefreshToken();
 
         try{
             Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(refreshToken);
             // refresh 토큰 만료가 안됬으면 새로운 access 토큰 생성.
             if(!claims.getBody().getExpiration().before(new Date())){
-                //return reCreateToken(claims.getBody().get().toString(), claims.getBody().get());
+                return reCreateToken((Authentication) claims.getBody().get("authentication"));
             }
         }
         catch (Exception e){
@@ -126,6 +149,7 @@ public class JwtTokenProvider implements InitializingBean {
             logger.info("재로그인 필요");
             return null;
         }
+
         return null;
     }
 

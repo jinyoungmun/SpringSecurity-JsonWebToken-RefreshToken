@@ -65,4 +65,11 @@ public class UserInfo {
             joinColumns = {@JoinColumn(name = "userInfoId", referencedColumnName = "userInfoId")},
             inverseJoinColumns = {@JoinColumn(name = "authorityName", referencedColumnName = "authorityName")})
     private Set<Authority> authorities;
+
+    @ManyToMany
+    @JoinTable(
+            name = "userRefreshToken",
+            joinColumns = {@JoinColumn(name = "userInfoId", referencedColumnName = "userInfoId")},
+            inverseJoinColumns = {@JoinColumn(name = "refreshToken", referencedColumnName = "refreshToken")})
+    private Set<RefreshToken> refreshToken;
 }

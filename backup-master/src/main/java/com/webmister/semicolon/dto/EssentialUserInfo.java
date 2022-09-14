@@ -37,5 +37,7 @@ public class EssentialUserInfo {
             this.userDescription = userInfo.getUserDescription();
         }
         this.authorityDtoSet = userInfo.getAuthorities().stream().map(AuthorityDto::new).collect(Collectors.toSet());
+
+
     }
 }

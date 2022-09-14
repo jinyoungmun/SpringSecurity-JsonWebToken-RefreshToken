@@ -7,16 +7,13 @@ import javax.persistence.*;
 
 @Entity
 @Data
-@Table(name = "refreshToken")
+@Table(name = "refresh")
 @Builder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class RefreshToken {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long refreshTokenId;
-
-    @Column(nullable = false)
-    private String refreshToken;
+    @Column(name = "refreshToken")
+    public String refreshToken;
 }

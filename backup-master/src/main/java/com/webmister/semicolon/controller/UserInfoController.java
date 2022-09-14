@@ -116,7 +116,7 @@ public class UserInfoController {
         try {
             if ( userInfoService.checkDuplicateUserNickname(userInfoRequest.getUserNickName()) == false)
                 if(userInfoService.checkDuplicateEmail(userInfoRequest.getUserEmail()) == false)
-            userInfoService.signUp(userInfoRequest);
+                    userInfoService.signUp(userInfoRequest);
         } catch (Exception e) {
             return new ResponseEntity<>(Boolean.FALSE, resHeaders, HttpStatus.BAD_REQUEST);
         }
