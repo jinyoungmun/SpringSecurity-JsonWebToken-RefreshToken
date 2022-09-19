@@ -1,7 +1,9 @@
 package com.webmister.semicolon.jwt;
 
-import com.webmister.semicolon.domain.RefreshToken;
+import com.webmister.semicolon.domain.UserInfo;
 import com.webmister.semicolon.dto.TokenDto;
+import com.webmister.semicolon.repository.UserInfoRepository;
+import com.webmister.semicolon.request.UserInfoRequest;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -32,15 +34,20 @@ public class JwtTokenProvider implements InitializingBean {
     private final String secret;
     private final long accessTokenValidityInMilliseconds;
     private final long refreshTokenValidityInMilliseconds;
+
+    private final UserInfoRepository userInfoRepository;
     private Key key;
 
     public JwtTokenProvider(
             @Value("${jwt.secret}") String secret,
             @Value("${jwt.access-token-validity-in-seconds}") long accessTokenValidityInSeconds,
-            @Value("${jwt.refresh-token-validity-in-seconds}") long refreshTokenValidityInSeconds){
+            @Value("${jwt.refresh-token-validity-in-seconds}") long refreshTokenValidityInSeconds,
+            UserInfoRepository userInfoRepository
+    ){
         this.secret = secret;
         this.accessTokenValidityInMilliseconds = accessTokenValidityInSeconds * 1000;
         this.refreshTokenValidityInMilliseconds = refreshTokenValidityInSeconds * 1000;
+        this.userInfoRepository = userInfoRepository;
     }
 
     @Override
@@ -49,7 +56,7 @@ public class JwtTokenProvider implements InitializingBean {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public TokenDto createToken(Authentication authentication) {
+    public TokenDto createToken(Authentication authentication, UserInfoRequest userInfoRequest) {
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
@@ -70,6 +77,11 @@ public class JwtTokenProvider implements InitializingBean {
                 .signWith(key, SignatureAlgorithm.HS512)
                 .setExpiration(new Date(now.getTime() +refreshTokenValidityInMilliseconds))
                 .compact();
+
+//        userInfoRepository.save(UserInfo.builder()
+//                .refreshToken(userInfoRequest.setRefreshToken(refreshToken))
+//                .build());
+
 
         return TokenDto.builder().accessToken(accessToken).refreshToken(refreshToken).build();
     }
@@ -133,7 +145,7 @@ public class JwtTokenProvider implements InitializingBean {
 //        return false; // false면 401에러.
 //    }
 
-    public String validateRefreshToken(RefreshToken refreshTokenObj){
+    public String validateRefreshToken(UserInfo refreshTokenObj){
 
         String refreshToken = refreshTokenObj.getRefreshToken();
 

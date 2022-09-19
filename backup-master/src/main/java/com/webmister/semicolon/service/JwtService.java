@@ -1,9 +1,9 @@
 package com.webmister.semicolon.service;
 
-import com.webmister.semicolon.domain.RefreshToken;
+import com.webmister.semicolon.domain.UserInfo;
 import com.webmister.semicolon.dto.TokenDto;
 import com.webmister.semicolon.jwt.JwtTokenProvider;
-import com.webmister.semicolon.repository.RefreshTokenRepository;
+import com.webmister.semicolon.repository.UserInfoRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,31 +17,37 @@ import java.util.Optional;
 public class JwtService {
 
     final JwtTokenProvider jwtTokenProvider;
-    final RefreshTokenRepository refreshTokenRepository;
+    final UserInfoRepository userInfoRepository;
 
 
     public JwtService(
             JwtTokenProvider jwtTokenProvider,
-            RefreshTokenRepository refreshTokenRepository){
+            UserInfoRepository userInfoRepository
+    ){
         this.jwtTokenProvider = jwtTokenProvider;
-        this.refreshTokenRepository = refreshTokenRepository;
+        this.userInfoRepository = userInfoRepository;
     }
 
+    // 이 메서드는 기존의 refreshToken이 존재하면 delete 하는 것인데, userInfoController /login에 적용시킬 방법을 구색해야 됨.
 //    @Transactional
 //    public void login(TokenDto tokenDto){
-//        RefreshToken refreshToken = RefreshToken.builder()..refreshToken(tokenDto.getRefreshToken()).build();
-//        if(refreshTokenRepository.existsById(id)){
-//            // .RefreshToken.exists()
+//        RefreshToken refreshToken = RefreshToken.builder().refreshToken(tokenDto.getRefreshToken()).build();
+//        String refreshToken1 = refreshToken.getRefreshToken();
+//        if(refreshTokenRepository.existsByRefreshToken(refreshToken1)){
+//            log.info("(구) refreshToken 삭제");
+//            refreshTokenRepository.deleteByRefreshToken(refreshToken1);
 //        }
+//        refreshTokenRepository.save(refreshToken);
+//
 //    }
 
-    public Optional<RefreshToken> getRefreshToken(String refreshToken){
+    public Optional<UserInfo> getRefreshToken(String refreshToken){
 
-        return refreshTokenRepository.findByRefreshToken(refreshToken);
+        return userInfoRepository.findByRefreshToken(refreshToken);
     }
 
     public Map<String, String> validateRefreshToken(String refreshToken){
-        RefreshToken refreshToken1 = getRefreshToken(refreshToken).get();
+        UserInfo refreshToken1 = getRefreshToken(refreshToken).get();
         String createdAccessToken = jwtTokenProvider.validateRefreshToken(refreshToken1);
 
         return createRefreshJson(createdAccessToken);

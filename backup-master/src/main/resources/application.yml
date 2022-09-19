@@ -7,13 +7,26 @@ spring:
     url: jdbc:mysql://localhost:3306/snsTest?useSSL=false&characterEncoding=UTF-8
     username: root
     password: root
+  mvc:
+    static-path-patten : /static/**
+  resource:
+    static-locations : classpath:/static/
+    add-mapping : true
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration
+
+  servlet:
+    multipart:
+      location: Users/jeonhyeonmin/Desktop/imageFile
+      maxFileSize: 200MB
+      maxRequestSize: 200MB
   jpa:
     database: mysql
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
     generate-ddl: true
     show-sql: true
     hibernate:
-      ddl-auto: create
+      ddl-auto: create-drop
 
 jwt:
   header: Authorization
@@ -23,7 +36,3 @@ jwt:
   secret: c2lsdmVybmluZS10ZWNoLXNwcmluZy1ib290LWp3dC10dXRvcmlhbC1zZWNyZXQtc2lsdmVybmluZS10ZWNoLXNwcmluZy1ib290LWp3dC10dXRvcmlhbC1zZWNyZXQK
   access-token-validity-in-seconds: 86400 #하루
   refresh-token-validity-in-seconds: 604800 #일주일
-
-logging:
-  level:
-    com.webmister: DEBUG

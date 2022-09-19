@@ -1,12 +1,17 @@
 package com.webmister.semicolon.repository;
 
-import com.webmister.semicolon.domain.RefreshToken;
+import com.webmister.semicolon.domain.UserInfo;
+import org.springframework.data.domain.Example;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long> {
+public interface RefreshTokenRepository extends JpaRepository<UserInfo, Long> {
 
-    Optional<RefreshToken> findByRefreshToken(String refreshToken);
-
+//    Optional<UserInfo> findByRefreshToken(String refreshToken);
+//
+//
+//    boolean existsByRefreshToken(String refreshToken);
+//
+//    void deleteByRefreshToken(String refreshToken);
 }

@@ -7,10 +7,12 @@ import com.webmister.semicolon.jwt.JwtTokenProvider;
 import com.webmister.semicolon.repository.UserInfoRepository;
 import com.webmister.semicolon.request.FindUserOnlyOneResponse;
 import com.webmister.semicolon.request.Login;
+import com.webmister.semicolon.request.TokenRequest;
 import com.webmister.semicolon.request.UserInfoRequest;
 import com.webmister.semicolon.response.FindUserOnlyOneRequest;
 import com.webmister.semicolon.service.UserInfoService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.User;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,19 +32,19 @@ import java.util.List;
 public class UserInfoController {
 
     private final UserInfoService userInfoService;
-    private final UserInfoRepository userInfoRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final UserInfoRepository userInfoRepository;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
     public UserInfoController(
             UserInfoService userInfoService,
-            UserInfoRepository userInfoRepository,
             JwtTokenProvider jwtTokenProvider,
+            UserInfoRepository userInfoRepository,
             AuthenticationManagerBuilder authenticationManagerBuilder
     ) {
         this.userInfoService = userInfoService;
-        this.userInfoRepository = userInfoRepository;
         this.jwtTokenProvider = jwtTokenProvider;
+        this.userInfoRepository = userInfoRepository;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
     }
 
@@ -79,9 +81,11 @@ public class UserInfoController {
     @RequestMapping(value = "/login",
             method = {RequestMethod.GET, RequestMethod.POST}
     )
-    public ResponseEntity<TokenDto> login(@RequestBody Login login){
+    public ResponseEntity<TokenDto> login(@RequestBody Login login, UserInfoRequest userInfoRequest){
         HttpHeaders resHeaders = new HttpHeaders();
         resHeaders.add("Content-Type", "application/json;charset=UTF-8");
+        //userInfoService.login(login)을 내리고. (내리는 이유는 jwtTokenProvider에서 토큰을 만들고 만든 토큰을 저장해야되기 때문에)
+        //userInfoService 메서드 login에서 로그인을 하면 refreshTokenRepository.save로 refreshToken을 저장
         userInfoService.login(login);
 
         UsernamePasswordAuthenticationToken authenticationToken =
@@ -90,7 +94,14 @@ public class UserInfoController {
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        TokenDto jwt = jwtTokenProvider.createToken(authentication);
+        TokenDto jwt = jwtTokenProvider.createToken(authentication, userInfoRequest);
+
+
+//        userInfoRepository.save(UserInfo.builder()
+//                        .refreshToken(jwt.getRefreshToken()).build());
+//        log.info(jwt.getRefreshToken());
+        userInfoService.login1(jwt, userInfoRequest);
+
         //Bearer에 accessToken만 있어도 되는지 여부 확인. 사실상 refreshToken은 accessToken을 재발급 받기 위한 것이라
         resHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " +jwt.getAccessToken());
         return new ResponseEntity<>(jwt, resHeaders,  HttpStatus.OK);

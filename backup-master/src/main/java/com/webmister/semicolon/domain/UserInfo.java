@@ -46,6 +46,9 @@ public class UserInfo {
     @Column
     private boolean activated;
 
+    @Column
+    private String refreshToken;
+
     @OneToMany(mappedBy = "userInfo", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     private List<Report> reportList = new ArrayList<Report>();
 
@@ -66,10 +69,10 @@ public class UserInfo {
             inverseJoinColumns = {@JoinColumn(name = "authorityName", referencedColumnName = "authorityName")})
     private Set<Authority> authorities;
 
-    @ManyToMany
-    @JoinTable(
-            name = "userRefreshToken",
-            joinColumns = {@JoinColumn(name = "userInfoId", referencedColumnName = "userInfoId")},
-            inverseJoinColumns = {@JoinColumn(name = "refreshToken", referencedColumnName = "refreshToken")})
-    private Set<RefreshToken> refreshToken;
+//    @ManyToMany
+//    @JoinTable(
+//            name = "userRefreshToken",
+//            joinColumns = {@JoinColumn(name = "userInfoId", referencedColumnName = "userInfoId")},
+//            inverseJoinColumns = {@JoinColumn(name = "refreshToken", referencedColumnName = "refreshToken")})
+//    private Set<RefreshToken> refreshToken;
 }
