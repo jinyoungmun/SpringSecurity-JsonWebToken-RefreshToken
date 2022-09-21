@@ -2,16 +2,12 @@ package com.webmister.semicolon.service;
 
 import com.webmister.semicolon.domain.Authority;
 import com.webmister.semicolon.domain.UserInfo;
-import com.webmister.semicolon.dto.TokenDto;
 import com.webmister.semicolon.repository.AuthorityRepository;
 import com.webmister.semicolon.repository.RefreshTokenRepository;
 import com.webmister.semicolon.repository.UserInfoRepository;
 import com.webmister.semicolon.request.Login;
-import com.webmister.semicolon.request.TokenRequest;
 import com.webmister.semicolon.request.UserInfoRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.User;
-import org.springframework.security.core.token.Token;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -31,8 +27,7 @@ public class UserInfoService {
                     UserInfoRepository userInfoRepository,
                     RefreshTokenRepository refreshTokenRepository,
                     AuthorityRepository authorityRepository,
-                    PasswordEncoder passwordEncoder
-            )
+                    PasswordEncoder passwordEncoder)
     {
         this.userInfoRepository = userInfoRepository;
         this.refreshTokenRepository = refreshTokenRepository;
@@ -64,37 +59,26 @@ public class UserInfoService {
 
     public UserInfo login(Login login) {
         log.info("서비스 로그인");
-//        UserInfoRequest userInfoRequest = new UserInfoRequest();
-//
-//
-//        login1(userInfoRequest);
+
         return userInfoRepository.findByUserEmailAndPassword(login.getUserEmail(), login.getPassword())
                 .orElse(new UserInfo());
     }
 
-    public Boolean login1(TokenDto tokenDto, UserInfoRequest userInfoRequest) {
+    public Boolean saveRefreshToken(String email, String refreshToken){
 
-        //UserInfoRequest userInfoRequest = new UserInfoRequest();
-
-//        userInfoRequest.setRefreshToken(tokenDto.getRefreshToken());
-//        log.info(userInfoRequest.getRefreshToken());
-        String a = tokenDto.getRefreshToken();
-        userInfoRequest.setRefreshToken(a);
-        log.info(a);
-        log.info(userInfoRequest.getRefreshToken());
+        UserInfo userInfo = userInfoRepository.findByUserEmail(email)
+                .orElse(new UserInfo()); // 수정 필요한지 검토
 
         try {
-            userInfoRepository.save(UserInfo.builder()
-                    .refreshToken(userInfoRequest.setRefreshToken(tokenDto.getRefreshToken()))
-                    .refreshToken(userInfoRequest.getRefreshToken())
-                    .build());
+            userInfoRepository.save(userInfo.setRefreshToken(refreshToken));
 
             log.info("리프레시 저장");
+            log.info(userInfo.getRefreshToken());
             return Boolean.TRUE;
 
-        } catch (Exception e) {
+        }catch (Exception e){
+
             log.info("리프레시 실패");
-            log.info(tokenDto.getRefreshToken());
             return Boolean.FALSE;
         }
     }
@@ -117,6 +101,7 @@ public class UserInfoService {
                     .userUniqueID(userInfoRequest.getUserUniqueID())
                     .userProfileImageUrl(userInfoRequest.getUserProfileImageUrl())
                     .userDescription(userInfoRequest.getUserDescription())
+                    .refreshToken(userInfoRequest.getRefreshToken())
                     .authorities(Collections.singleton(authorityRepository.save(Authority.builder().authorityName("ROLE_USER").build())))
                     .activated(true)
                     .build());

@@ -15,6 +15,8 @@ public class EssentialUserInfo {
     String userUniqueId;
     String userProfileImageUrl;
     String userDescription;
+    String accessToken;
+    String refreshToken;
 
     private Set<AuthorityDto> authorityDtoSet;
 
@@ -36,6 +38,9 @@ public class EssentialUserInfo {
         if (userInfo.getUserDescription() != null) {
             this.userDescription = userInfo.getUserDescription();
         }
+
+        this.refreshToken = getRefreshToken();
+
         this.authorityDtoSet = userInfo.getAuthorities().stream().map(AuthorityDto::new).collect(Collectors.toSet());
 
 

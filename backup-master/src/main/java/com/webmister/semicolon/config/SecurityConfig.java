@@ -83,6 +83,8 @@ public class SecurityConfig {
 
                 .antMatchers("/api/commentUpload").access("hasAnyRole('USER','ADMIN')")
 
+                .antMatchers("/api/refresh").permitAll()
+
                 .anyRequest().authenticated()
 
                 .and()

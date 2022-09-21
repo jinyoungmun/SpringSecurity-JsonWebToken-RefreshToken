@@ -1,4 +1,4 @@
-package com.webmister.semicolon.request;
+package com.webmister.semicolon.response;
 
 import com.webmister.semicolon.dto.EssentialReport;
 import com.webmister.semicolon.domain.Report;

@@ -4,7 +4,10 @@ import com.webmister.semicolon.domain.UserInfo;
 import com.webmister.semicolon.dto.TokenDto;
 import com.webmister.semicolon.jwt.JwtTokenProvider;
 import com.webmister.semicolon.repository.UserInfoRepository;
+import com.webmister.semicolon.request.UserInfoRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.el.parser.BooleanNode;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,18 +31,22 @@ public class JwtService {
         this.userInfoRepository = userInfoRepository;
     }
 
-    // 이 메서드는 기존의 refreshToken이 존재하면 delete 하는 것인데, userInfoController /login에 적용시킬 방법을 구색해야 됨.
-//    @Transactional
-//    public void login(TokenDto tokenDto){
-//        RefreshToken refreshToken = RefreshToken.builder().refreshToken(tokenDto.getRefreshToken()).build();
-//        String refreshToken1 = refreshToken.getRefreshToken();
-//        if(refreshTokenRepository.existsByRefreshToken(refreshToken1)){
-//            log.info("(구) refreshToken 삭제");
-//            refreshTokenRepository.deleteByRefreshToken(refreshToken1);
-//        }
-//        refreshTokenRepository.save(refreshToken);
-//
-//    }
+    // 이 메서드는 기존의 refreshToken이 존재하면 delete. +refresToken 삭제 이유 파악. userInfoController.login으로 메서드 호출함
+    @Transactional
+    public Boolean login(String email) {
+        UserInfo userInfo = userInfoRepository.findByUserEmail(email).orElse(new UserInfo());
+
+        try {
+            if (userInfoRepository.existsByUserEmail(email) == true) {
+                log.info("(구) refreshToken 삭제");
+                userInfoRepository.save(userInfo.setRefreshToken(null));
+                //userInfoRepository.deleteByUserEmail(email);
+            }
+            return Boolean.TRUE;
+        } catch (Exception e) {
+            return Boolean.FALSE;
+        }
+    }
 
     public Optional<UserInfo> getRefreshToken(String refreshToken){
 
@@ -65,6 +72,7 @@ public class JwtService {
 
             return map;
         }
+        //기존에 존재하는 accessToken 제거
 
         map.put("status", "200");
         map.put("message", "Refresh 토큰을 통한 Access Token 생성이 완료되었습니다.");

@@ -5,23 +5,20 @@ import com.webmister.semicolon.dto.TokenDto;
 import com.webmister.semicolon.jwt.JwtFilter;
 import com.webmister.semicolon.jwt.JwtTokenProvider;
 import com.webmister.semicolon.repository.UserInfoRepository;
-import com.webmister.semicolon.request.FindUserOnlyOneResponse;
+import com.webmister.semicolon.response.FindUserOnlyOneResponse;
 import com.webmister.semicolon.request.Login;
-import com.webmister.semicolon.request.TokenRequest;
 import com.webmister.semicolon.request.UserInfoRequest;
-import com.webmister.semicolon.response.FindUserOnlyOneRequest;
+import com.webmister.semicolon.request.FindUserOnlyOneRequest;
+import com.webmister.semicolon.service.JwtService;
 import com.webmister.semicolon.service.UserInfoService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.User;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.token.Token;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,17 +31,20 @@ public class UserInfoController {
     private final UserInfoService userInfoService;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserInfoRepository userInfoRepository;
+    private final JwtService jwtService;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
     public UserInfoController(
             UserInfoService userInfoService,
             JwtTokenProvider jwtTokenProvider,
             UserInfoRepository userInfoRepository,
+            JwtService jwtService,
             AuthenticationManagerBuilder authenticationManagerBuilder
     ) {
         this.userInfoService = userInfoService;
         this.jwtTokenProvider = jwtTokenProvider;
         this.userInfoRepository = userInfoRepository;
+        this.jwtService = jwtService;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
     }
 
@@ -81,11 +81,9 @@ public class UserInfoController {
     @RequestMapping(value = "/login",
             method = {RequestMethod.GET, RequestMethod.POST}
     )
-    public ResponseEntity<TokenDto> login(@RequestBody Login login, UserInfoRequest userInfoRequest){
+    public ResponseEntity<TokenDto> login(@RequestBody Login login){
         HttpHeaders resHeaders = new HttpHeaders();
         resHeaders.add("Content-Type", "application/json;charset=UTF-8");
-        //userInfoService.login(login)을 내리고. (내리는 이유는 jwtTokenProvider에서 토큰을 만들고 만든 토큰을 저장해야되기 때문에)
-        //userInfoService 메서드 login에서 로그인을 하면 refreshTokenRepository.save로 refreshToken을 저장
         userInfoService.login(login);
 
         UsernamePasswordAuthenticationToken authenticationToken =
@@ -94,15 +92,13 @@ public class UserInfoController {
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        TokenDto jwt = jwtTokenProvider.createToken(authentication, userInfoRequest);
+        TokenDto jwt = jwtTokenProvider.createToken(authentication);
 
+        userInfoService.saveRefreshToken(login.getUserEmail(), jwt.getRefreshToken());
 
-//        userInfoRepository.save(UserInfo.builder()
-//                        .refreshToken(jwt.getRefreshToken()).build());
-//        log.info(jwt.getRefreshToken());
-        userInfoService.login1(jwt, userInfoRequest);
+        jwtService.login(login.getUserEmail());
+        // 기존 리프레시 지우고, 리프레시 유효시간 체크해서 남으면 자동 액세스 토큰 재발급 / 지났으면 401 에러 리턴하면서 클라이언트가 로그인.
 
-        //Bearer에 accessToken만 있어도 되는지 여부 확인. 사실상 refreshToken은 accessToken을 재발급 받기 위한 것이라
         resHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " +jwt.getAccessToken());
         return new ResponseEntity<>(jwt, resHeaders,  HttpStatus.OK);
     }

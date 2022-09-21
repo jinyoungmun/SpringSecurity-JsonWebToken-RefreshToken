@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Slf4j
 public class TokenDto {
 
     private String accessToken;

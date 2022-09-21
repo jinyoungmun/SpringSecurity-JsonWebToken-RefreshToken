@@ -26,8 +26,6 @@ public interface UserInfoRepository extends JpaRepository<UserInfo, Long> {
 
     Optional<UserInfo> findByRefreshToken(String refreshToken);
 
-    boolean existsById(String refreshToken);
-
-    void deleteById(String refreshToken);
+    void deleteByUserEmail(String userEmail);
 
 }

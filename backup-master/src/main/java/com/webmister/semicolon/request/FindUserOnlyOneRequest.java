@@ -1,4 +1,4 @@
-package com.webmister.semicolon.response;
+package com.webmister.semicolon.request;
 
 import lombok.Data;
 

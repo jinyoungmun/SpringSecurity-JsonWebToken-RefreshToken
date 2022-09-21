@@ -56,7 +56,7 @@ public class JwtTokenProvider implements InitializingBean {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public TokenDto createToken(Authentication authentication, UserInfoRequest userInfoRequest) {
+    public TokenDto createToken(Authentication authentication) {
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
@@ -77,11 +77,6 @@ public class JwtTokenProvider implements InitializingBean {
                 .signWith(key, SignatureAlgorithm.HS512)
                 .setExpiration(new Date(now.getTime() +refreshTokenValidityInMilliseconds))
                 .compact();
-
-//        userInfoRepository.save(UserInfo.builder()
-//                .refreshToken(userInfoRequest.setRefreshToken(refreshToken))
-//                .build());
-
 
         return TokenDto.builder().accessToken(accessToken).refreshToken(refreshToken).build();
     }
