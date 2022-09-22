@@ -50,7 +50,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf().disable()
+                .cors().and().csrf().disable()
                 .formLogin().disable()
                 .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
 
@@ -68,6 +68,7 @@ public class SecurityConfig {
                 .antMatchers("/api/login").permitAll()
                 .antMatchers("/api/printAll").permitAll()
                 .antMatchers("/api/get").permitAll()
+                .antMatchers("/api/refresh/{userNickname}").permitAll()
                 .antMatchers("/api/{userNickname}").access("hasAnyRole('USER','ADMIN')")
                 .antMatchers("api/userDelete/{userNickname}").access("hasAnyRole('USER','ADMIN')")
 
@@ -83,9 +84,9 @@ public class SecurityConfig {
 
                 .antMatchers("/api/commentUpload").access("hasAnyRole('USER','ADMIN')")
 
-                .antMatchers("/api/refresh").permitAll()
+                //.antMatchers("/api/refresh").access("hasAnyRole('USER','ADMIN')")
 
-                .anyRequest().authenticated()
+                .anyRequest().permitAll()
 
                 .and()
                 .apply(new JwtSecurityConfig(jwtTokenProvider));

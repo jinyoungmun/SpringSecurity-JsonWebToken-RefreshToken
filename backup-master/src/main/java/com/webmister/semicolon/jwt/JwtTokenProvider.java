@@ -121,8 +121,8 @@ public class JwtTokenProvider implements InitializingBean {
 //        String refreshToken = refreshTokenObj.getRefreshToken();
 //
 //        try{
-//            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(refreshToken);
-//            if(!Jwts.claims().getExpiration().before(new Date())){
+//            Jws.parserBuilder().setSigningKey(key).build().parseClaimsJws(refreshToken);
+//            if(!Jws.claims().getExpiration().before(new Date())){
 //                return reCreateToken();
 //            }
 //            return true;
@@ -140,28 +140,26 @@ public class JwtTokenProvider implements InitializingBean {
 //        return false; // false면 401에러.
 //    }
 
-    public String validateRefreshToken(UserInfo refreshTokenObj){
+    public Boolean validateRefreshToken(String refreshToken){
 
-        String refreshToken = refreshTokenObj.getRefreshToken();
+        //String refreshToken = refreshTokenObj.getRefreshToken();
 
         try{
             Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(refreshToken);
             // refresh 토큰 만료가 안됬으면 새로운 access 토큰 생성.
             if(!claims.getBody().getExpiration().before(new Date())){
-                return reCreateToken((Authentication) claims.getBody().get("authentication"));
             }
+            return Boolean.TRUE;
         }
         catch (Exception e){
             // refresh 토큰이 만료된 경우, 로그인이 필요.
             logger.info("재로그인 필요");
-            return null;
+            return Boolean.FALSE;
         }
-
-        return null;
     }
 
     //refresh 유효성 검사 거치고 accessToken 새로 발급하는 메서드.
-    public String reCreateToken(Authentication authentication) {
+    public TokenDto reCreateToken(Authentication authentication) {
 
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -177,6 +175,6 @@ public class JwtTokenProvider implements InitializingBean {
                 .setExpiration(validity)
                 .compact();
 
-        return accessToken;
+        return TokenDto.builder().accessToken(accessToken).build();
     }
 }

@@ -94,9 +94,9 @@ public class UserInfoController {
 
         TokenDto jwt = jwtTokenProvider.createToken(authentication);
 
-        userInfoService.saveRefreshToken(login.getUserEmail(), jwt.getRefreshToken());
+        jwtService.previousRefreshTokenDelete(login.getUserEmail());
 
-        jwtService.login(login.getUserEmail());
+        userInfoService.saveRefreshToken(login.getUserEmail(), jwt.getRefreshToken());
         // 기존 리프레시 지우고, 리프레시 유효시간 체크해서 남으면 자동 액세스 토큰 재발급 / 지났으면 401 에러 리턴하면서 클라이언트가 로그인.
 
         resHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " +jwt.getAccessToken());
