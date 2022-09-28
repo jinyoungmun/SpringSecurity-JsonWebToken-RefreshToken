@@ -2,6 +2,7 @@ package com.webmister.semicolon.service;
 
 import com.webmister.semicolon.domain.Authority;
 import com.webmister.semicolon.domain.UserInfo;
+import com.webmister.semicolon.enumclass.UserStatus;
 import com.webmister.semicolon.repository.AuthorityRepository;
 import com.webmister.semicolon.repository.RefreshTokenRepository;
 import com.webmister.semicolon.repository.UserInfoRepository;
@@ -39,8 +40,12 @@ public class UserInfoService {
         return userInfoRepository.findById(id).orElse(new UserInfo());
     }
 
-    public UserInfo findUserInfoByUserNickname(String userNickname){
-        return userInfoRepository.findUserInfoByUserNickName(userNickname).orElse(new UserInfo());
+    public UserInfo findUserInfoByUserNickName(String userNickName){
+        return userInfoRepository.findUserInfoByUserNickName(userNickName).orElse(new UserInfo());
+    }
+
+    public Authority findByAuthorityName(String authorityName){
+        return authorityRepository.findByAuthorityName(authorityName);
     }
 
     public List<UserInfo> findAll(){
@@ -98,7 +103,7 @@ public class UserInfoService {
                     .password(passwordEncoder.encode(userInfoRequest.getPassword()))
                     .userEmail(userInfoRequest.getUserEmail())
                     .userNickName(userInfoRequest.getUserNickName())
-                    .userUniqueID(userInfoRequest.getUserUniqueID())
+                    .userUniqueID(UserStatus.USER)
                     .userProfileImageUrl(userInfoRequest.getUserProfileImageUrl())
                     .userDescription(userInfoRequest.getUserDescription())
                     .refreshToken(userInfoRequest.getRefreshToken())
@@ -106,6 +111,7 @@ public class UserInfoService {
                     .activated(true)
                     .build());
 
+                    log.info(passwordEncoder.encode(userInfoRequest.getPassword()));
             log.info("서비스 회갑");
             return Boolean.TRUE;
         } catch (Exception e) {

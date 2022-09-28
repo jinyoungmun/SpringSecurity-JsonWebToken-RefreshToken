@@ -104,11 +104,12 @@ public class UserInfoController {
     }
 
 
-    @RequestMapping(value = "/{userNickname}",
+    @RequestMapping(value = "/{userNickName}",
             method = {RequestMethod.GET, RequestMethod.POST}
     )
-    public ResponseEntity<UserInfo> createUser(@PathVariable("userNickname") String userNickname){
-        UserInfo user1 = userInfoService.findUserInfoByUserNickname(userNickname);
+    public ResponseEntity<UserInfo> createUser(@PathVariable("userNickName") String userNickName){
+
+        UserInfo user1 = userInfoService.findUserInfoByUserNickName(userNickName);
         log.debug(String.valueOf(user1));
         HttpHeaders resHeaders = new HttpHeaders();
         resHeaders.add("Content-Type", "application/json;charset=UTF-8");

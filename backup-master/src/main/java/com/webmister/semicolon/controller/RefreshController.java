@@ -5,6 +5,7 @@ import com.webmister.semicolon.dto.TokenDto;
 import com.webmister.semicolon.jwt.JwtFilter;
 import com.webmister.semicolon.jwt.JwtTokenProvider;
 import com.webmister.semicolon.repository.UserInfoRepository;
+import com.webmister.semicolon.request.Login;
 import com.webmister.semicolon.request.RefreshApiResponseMessage;
 import com.webmister.semicolon.request.UserInfoRequest;
 import com.webmister.semicolon.service.JwtService;
@@ -18,6 +19,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.token.Token;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -75,27 +77,38 @@ public class RefreshController {
 //
 //    }
 
-    @RequestMapping(value = "/refresh/{userNickname}",
+    @RequestMapping(value = "/refresh/{userNickName}",
             method = {RequestMethod.GET, RequestMethod.POST}
     )
-    public ResponseEntity<TokenDto> validateRefreshToken(@PathVariable("userNickname") String userNickname){
+    public ResponseEntity<TokenDto> validateRefreshToken(@PathVariable("userNickName") String userNickName){
 
-        log.info("/refresh/{userNickname}");
-        HttpHeaders resHeaders = new HttpHeaders();
-        resHeaders.add("Content-Type", "application/json;charset=UTF-8");
+        UserInfo userInfo = userInfoService.findUserInfoByUserNickName(userNickName);
 
-        UserInfo userInfo = userInfoService.findUserInfoByUserNickname(userNickname);
+        //jwtService.getRole(userInfo.getUserNickName());
 
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(userInfo.getUserEmail(), userInfo.getPassword());
 
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        log.info("1");
+        //Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+
+        /*
+        log.info("2");
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        Boolean status = jwtTokenProvider.validateRefreshToken(userInfo.getRefreshToken());
+         */
+
+        String refreshToken = jwtService.findRefreshToken(userInfo.getUserEmail());
+
+        Boolean status = jwtTokenProvider.validateRefreshToken(refreshToken);
+        log.info(refreshToken);
+
+        HttpHeaders resHeaders = new HttpHeaders();
+        resHeaders.add("Content-Type", "application/json;charset=UTF-8");
 
         if(status == true) {
-            TokenDto jwt = jwtTokenProvider.reCreateToken(authentication);
+
+            TokenDto jwt = jwtTokenProvider.reCreateToken(authenticationToken);
 
             resHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + jwt.getAccessToken());
 

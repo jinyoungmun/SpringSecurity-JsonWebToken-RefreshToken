@@ -47,7 +47,7 @@ public class Report {
     private List<Comment> comments;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userInfo")
+    @JoinColumn(name = "userInfoId")
     @JsonBackReference
     private UserInfo userInfo;
 

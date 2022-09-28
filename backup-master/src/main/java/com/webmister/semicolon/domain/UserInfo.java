@@ -1,5 +1,6 @@
 package com.webmister.semicolon.domain;
 
+import com.webmister.semicolon.enumclass.UserStatus;
 import lombok.*;
 
 import javax.persistence.*;
@@ -35,7 +36,8 @@ public class UserInfo {
     private LocalDateTime userInfoCreateDate;
 
     @Column(nullable = false)
-    private String userUniqueID;
+    @Enumerated(EnumType.STRING)
+    private UserStatus userUniqueID;
 
     @Column
     private String userProfileImageUrl;
@@ -62,6 +64,11 @@ public class UserInfo {
         return this;
     }
 
+    public UserInfo setAuthorities(Set authorities){
+        this.authorities = authorities;
+        return this;
+    }
+
     @PrePersist
     public void UserInfoCreatDate() {
         this.userInfoCreateDate = LocalDateTime.now();
@@ -73,4 +80,7 @@ public class UserInfo {
             joinColumns = {@JoinColumn(name = "userInfoId", referencedColumnName = "userInfoId")},
             inverseJoinColumns = {@JoinColumn(name = "authorityName", referencedColumnName = "authorityName")})
     private Set<Authority> authorities;
+
+//    @OneToMany(mappedBy = "userInfo", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+//    private Set<Authority> authorities;
 }

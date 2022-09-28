@@ -1,8 +1,10 @@
 package com.webmister.semicolon.service;
 
+import com.webmister.semicolon.domain.Authority;
 import com.webmister.semicolon.domain.UserInfo;
 import com.webmister.semicolon.dto.TokenDto;
 import com.webmister.semicolon.jwt.JwtTokenProvider;
+import com.webmister.semicolon.repository.AuthorityRepository;
 import com.webmister.semicolon.repository.UserInfoRepository;
 import com.webmister.semicolon.request.UserInfoRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -21,14 +24,20 @@ public class JwtService {
 
     final JwtTokenProvider jwtTokenProvider;
     final UserInfoRepository userInfoRepository;
+    final AuthorityRepository authorityRepository;
+    final UserInfoService userInfoService;
 
 
     public JwtService(
             JwtTokenProvider jwtTokenProvider,
-            UserInfoRepository userInfoRepository
+            UserInfoRepository userInfoRepository,
+            AuthorityRepository authorityRepository,
+            UserInfoService userInfoService
     ){
         this.jwtTokenProvider = jwtTokenProvider;
         this.userInfoRepository = userInfoRepository;
+        this.authorityRepository = authorityRepository;
+        this.userInfoService = userInfoService;
     }
 
     @Transactional
@@ -47,38 +56,46 @@ public class JwtService {
         }
     }
 
+    public String findRefreshToken(String email){
+        UserInfo userInfo = userInfoRepository.findByUserEmail(email).orElse(new UserInfo());
+        return userInfo.getRefreshToken();
+    }
+
+    public void getRole(String userNickName){
+        UserInfo userInfo = userInfoService.findUserInfoByUserNickName(userNickName);
+        //Authority authority = new Authority();
+        Authority authority = userInfoService.findByAuthorityName("ROLE_USER");
+        //userInfoRepository.save(userInfo.setAuthorities(null));
+        authority.setAuthorityName("ROLE_USER");
+        log.info(authority.getAuthorityName());
+        userInfoRepository.save(userInfo.setAuthorities(Collections.singleton(authorityRepository.save(authority.setAuthorityName("ROLE_USER")))));
+    }
+    /*
+
+    public Boolean authority(String email){
+
+        UserInfo userInfo = userInfoRepository.findByUserEmail(email)
+                .orElse(new UserInfo()); // 수정 필요한지 검토
+
+
+        try {
+            userInfoRepository.save(Collections.singleton(authorityRepository.save(Authority.setAuthorityName("ROLE_USER"))));
+
+            log.info("리프레시 저장");
+            log.info(userInfo.getRefreshToken());
+            return Boolean.TRUE;
+
+        }catch (Exception e){
+
+            log.info("리프레시 실패");
+            return Boolean.FALSE;
+        }
+    }
+
+     */
+
     public Optional<UserInfo> getRefreshToken(String refreshToken){
 
         return userInfoRepository.findByRefreshToken(refreshToken);
     }
-
-//    public Map<String, String> validateRefreshToken(String refreshToken){
-//        UserInfo refreshToken1 = getRefreshToken(refreshToken).get();
-//        String createdAccessToken = jwtTokenProvider.validateRefreshToken(refreshToken1);
-//
-//        return createRefreshJson(createdAccessToken);
-//    }
-
-    public Map<String, String> createRefreshJson(String createdAccessToken){
-
-        Map<String, String> map = new HashMap<>();
-
-        if(createdAccessToken == null){
-
-            map.put("errorType", "Forbidden");
-            map.put("status", "401");
-            map.put("message", "Refresh 토큰이 만료되었습니다. 로그인이 필요합니다.");
-
-            return map;
-        }
-        //기존에 존재하는 accessToken 제거
-
-        map.put("status", "200");
-        map.put("message", "Refresh 토큰을 통한 Access Token 생성이 완료되었습니다.");
-        map.put("accessToken", createdAccessToken);
-
-        return map;
-
-    }
-
 }
