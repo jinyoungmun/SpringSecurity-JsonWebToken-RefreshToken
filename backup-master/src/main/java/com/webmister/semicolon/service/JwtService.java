@@ -2,42 +2,36 @@ package com.webmister.semicolon.service;
 
 import com.webmister.semicolon.domain.Authority;
 import com.webmister.semicolon.domain.UserInfo;
-import com.webmister.semicolon.dto.TokenDto;
-import com.webmister.semicolon.jwt.JwtTokenProvider;
+import com.webmister.semicolon.enumclass.UserStatus;
 import com.webmister.semicolon.repository.AuthorityRepository;
 import com.webmister.semicolon.repository.UserInfoRepository;
 import com.webmister.semicolon.request.UserInfoRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
 @Service
 public class JwtService {
-
-    final JwtTokenProvider jwtTokenProvider;
-    final UserInfoRepository userInfoRepository;
-    final AuthorityRepository authorityRepository;
-    final UserInfoService userInfoService;
+    private final UserInfoRepository userInfoRepository;
+    private final AuthorityRepository authorityRepository;
+    private final PasswordEncoder passwordEncoder;
 
 
     public JwtService(
-            JwtTokenProvider jwtTokenProvider,
+
             UserInfoRepository userInfoRepository,
             AuthorityRepository authorityRepository,
-            UserInfoService userInfoService
+            PasswordEncoder passwordEncoder
     ){
-        this.jwtTokenProvider = jwtTokenProvider;
+
         this.userInfoRepository = userInfoRepository;
         this.authorityRepository = authorityRepository;
-        this.userInfoService = userInfoService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional
@@ -61,38 +55,42 @@ public class JwtService {
         return userInfo.getRefreshToken();
     }
 
-    public void getRole(String userNickName){
-        UserInfo userInfo = userInfoService.findUserInfoByUserNickName(userNickName);
-        //Authority authority = new Authority();
-        Authority authority = userInfoService.findByAuthorityName("ROLE_USER");
-        //userInfoRepository.save(userInfo.setAuthorities(null));
-        authority.setAuthorityName("ROLE_USER");
-        log.info(authority.getAuthorityName());
-        userInfoRepository.save(userInfo.setAuthorities(Collections.singleton(authorityRepository.save(authority.setAuthorityName("ROLE_USER")))));
+    public UserInfoRequest requestSave(UserInfoRequest userInfoRequest, UserInfo userInfo){
+        userInfoRequest.setUserEmail(userInfo.getUserEmail());
+        userInfoRequest.setDecodedPassword(userInfo.getDecodedPassword());
+        userInfoRequest.setUserNickName(userInfo.getUserNickName());
+        userInfoRequest.setUserUniqueID(userInfo.getUserUniqueID());
+        userInfoRequest.setUserProfileImageUrl(userInfo.getUserProfileImageUrl());
+        userInfoRequest.setUserDescription(userInfo.getUserDescription());
+        userInfoRequest.setRefreshToken(userInfo.getRefreshToken());
+        log.info("리퀘스트 재저장");
+        return userInfoRequest;
     }
-    /*
 
-    public Boolean authority(String email){
+    public Boolean roleSetUp(UserInfoRequest userInfoRequest, UserInfo userInfo){
+        try{
 
-        UserInfo userInfo = userInfoRepository.findByUserEmail(email)
-                .orElse(new UserInfo()); // 수정 필요한지 검토
+            userInfoRepository.deleteByUserEmail(userInfo.getUserEmail());
+            userInfoRepository.save(UserInfo.builder()
+                    .password(passwordEncoder.encode(userInfoRequest.getPassword()))
+                    .userEmail(userInfoRequest.getUserEmail())
+                    .userNickName(userInfoRequest.getUserNickName())
+                    .userUniqueID(UserStatus.USER)
+                    .userProfileImageUrl(userInfoRequest.getUserProfileImageUrl())
+                    .userDescription(userInfoRequest.getUserDescription())
+                    .refreshToken(userInfoRequest.getRefreshToken())
+                    .authorities(Collections.singleton(authorityRepository.save(Authority.builder().authorityName("ROLE_USER").build())))
+                    .activated(true)
+                    .build());
 
-
-        try {
-            userInfoRepository.save(Collections.singleton(authorityRepository.save(Authority.setAuthorityName("ROLE_USER"))));
-
-            log.info("리프레시 저장");
-            log.info(userInfo.getRefreshToken());
             return Boolean.TRUE;
+        }
+        catch(Exception e){
 
-        }catch (Exception e){
 
-            log.info("리프레시 실패");
             return Boolean.FALSE;
         }
     }
-
-     */
 
     public Optional<UserInfo> getRefreshToken(String refreshToken){
 

@@ -1,7 +1,6 @@
 package com.webmister.semicolon.service;
 
 import com.webmister.semicolon.domain.Report;
-import com.webmister.semicolon.domain.UserInfo;
 import com.webmister.semicolon.repository.ReportRepository;
 import com.webmister.semicolon.request.DeleteReportRequest;
 import com.webmister.semicolon.request.UploadRequest;
@@ -10,8 +9,13 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ReportService {
-    @Autowired
-    ReportRepository reportRepository;
+    private final ReportRepository reportRepository;
+
+    public ReportService(
+            ReportRepository reportRepository
+    ){
+        this.reportRepository = reportRepository;
+    }
 
 
     public Boolean reportUpload(UploadRequest uploadRequest){

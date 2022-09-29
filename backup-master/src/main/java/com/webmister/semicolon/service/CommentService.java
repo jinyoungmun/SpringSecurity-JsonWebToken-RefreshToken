@@ -1,11 +1,8 @@
 package com.webmister.semicolon.service;
 
 import com.webmister.semicolon.domain.Comment;
-import com.webmister.semicolon.domain.Report;
 import com.webmister.semicolon.dto.CommentRequest;
 import com.webmister.semicolon.repository.CommentRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service

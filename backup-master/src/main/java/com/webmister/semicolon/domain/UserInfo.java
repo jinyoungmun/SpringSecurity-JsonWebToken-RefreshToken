@@ -30,6 +30,9 @@ public class UserInfo {
     private String password;
 
     @Column(nullable = false)
+    private String decodedPassword;
+
+    @Column(nullable = false)
     private String userNickName;
 
     @Column(nullable = false)
@@ -80,7 +83,4 @@ public class UserInfo {
             joinColumns = {@JoinColumn(name = "userInfoId", referencedColumnName = "userInfoId")},
             inverseJoinColumns = {@JoinColumn(name = "authorityName", referencedColumnName = "authorityName")})
     private Set<Authority> authorities;
-
-//    @OneToMany(mappedBy = "userInfo", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
-//    private Set<Authority> authorities;
 }

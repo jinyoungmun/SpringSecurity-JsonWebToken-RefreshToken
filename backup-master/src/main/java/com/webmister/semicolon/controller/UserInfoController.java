@@ -4,7 +4,6 @@ import com.webmister.semicolon.domain.UserInfo;
 import com.webmister.semicolon.dto.TokenDto;
 import com.webmister.semicolon.jwt.JwtFilter;
 import com.webmister.semicolon.jwt.JwtTokenProvider;
-import com.webmister.semicolon.repository.UserInfoRepository;
 import com.webmister.semicolon.response.FindUserOnlyOneResponse;
 import com.webmister.semicolon.request.Login;
 import com.webmister.semicolon.request.UserInfoRequest;
@@ -30,20 +29,17 @@ public class UserInfoController {
 
     private final UserInfoService userInfoService;
     private final JwtTokenProvider jwtTokenProvider;
-    private final UserInfoRepository userInfoRepository;
     private final JwtService jwtService;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
     public UserInfoController(
             UserInfoService userInfoService,
             JwtTokenProvider jwtTokenProvider,
-            UserInfoRepository userInfoRepository,
             JwtService jwtService,
             AuthenticationManagerBuilder authenticationManagerBuilder
     ) {
         this.userInfoService = userInfoService;
         this.jwtTokenProvider = jwtTokenProvider;
-        this.userInfoRepository = userInfoRepository;
         this.jwtService = jwtService;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
     }
@@ -87,7 +83,9 @@ public class UserInfoController {
         userInfoService.login(login);
 
         UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(login.getUserEmail(), login.getPassword());
+                new UsernamePasswordAuthenticationToken(login.getUserEmail(), login.getPassword()); //1234
+
+        log.info(login.getPassword());
 
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -122,8 +120,8 @@ public class UserInfoController {
         resHeaders.add("Content-Type", "application/json;charset=UTF-8");
 
         try {
-            if ( userInfoService.checkDuplicateUserNickname(userInfoRequest.getUserNickName()) == false)
-                if(userInfoService.checkDuplicateEmail(userInfoRequest.getUserEmail()) == false)
+            if (!userInfoService.checkDuplicateUserNickname(userInfoRequest.getUserNickName()))
+                if(!userInfoService.checkDuplicateEmail(userInfoRequest.getUserEmail()))
                     userInfoService.signUp(userInfoRequest);
         } catch (Exception e) {
             return new ResponseEntity<>(Boolean.FALSE, resHeaders, HttpStatus.BAD_REQUEST);

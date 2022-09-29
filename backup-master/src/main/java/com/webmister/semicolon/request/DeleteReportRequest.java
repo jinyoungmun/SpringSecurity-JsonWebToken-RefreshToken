@@ -4,9 +4,5 @@ import lombok.Data;
 
 @Data
 public class DeleteReportRequest {
-
     Long report_id;
-
-
-
 }

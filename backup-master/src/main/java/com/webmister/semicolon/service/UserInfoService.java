@@ -4,7 +4,6 @@ import com.webmister.semicolon.domain.Authority;
 import com.webmister.semicolon.domain.UserInfo;
 import com.webmister.semicolon.enumclass.UserStatus;
 import com.webmister.semicolon.repository.AuthorityRepository;
-import com.webmister.semicolon.repository.RefreshTokenRepository;
 import com.webmister.semicolon.repository.UserInfoRepository;
 import com.webmister.semicolon.request.Login;
 import com.webmister.semicolon.request.UserInfoRequest;
@@ -19,19 +18,16 @@ import java.util.List;
 @Service
 public class UserInfoService {
     private final UserInfoRepository userInfoRepository;
-    private final RefreshTokenRepository refreshTokenRepository;
     private final AuthorityRepository authorityRepository;
     private final PasswordEncoder passwordEncoder;
 
     public UserInfoService
             (
                     UserInfoRepository userInfoRepository,
-                    RefreshTokenRepository refreshTokenRepository,
                     AuthorityRepository authorityRepository,
                     PasswordEncoder passwordEncoder)
     {
         this.userInfoRepository = userInfoRepository;
-        this.refreshTokenRepository = refreshTokenRepository;
         this.authorityRepository = authorityRepository;
         this.passwordEncoder = passwordEncoder;
     }
@@ -42,10 +38,6 @@ public class UserInfoService {
 
     public UserInfo findUserInfoByUserNickName(String userNickName){
         return userInfoRepository.findUserInfoByUserNickName(userNickName).orElse(new UserInfo());
-    }
-
-    public Authority findByAuthorityName(String authorityName){
-        return authorityRepository.findByAuthorityName(authorityName);
     }
 
     public List<UserInfo> findAll(){
@@ -101,6 +93,7 @@ public class UserInfoService {
 
             userInfoRepository.save(UserInfo.builder()
                     .password(passwordEncoder.encode(userInfoRequest.getPassword()))
+                    .decodedPassword(userInfoRequest.getPassword())
                     .userEmail(userInfoRequest.getUserEmail())
                     .userNickName(userInfoRequest.getUserNickName())
                     .userUniqueID(UserStatus.USER)
@@ -111,7 +104,6 @@ public class UserInfoService {
                     .activated(true)
                     .build());
 
-                    log.info(passwordEncoder.encode(userInfoRequest.getPassword()));
             log.info("서비스 회갑");
             return Boolean.TRUE;
         } catch (Exception e) {
@@ -119,17 +111,4 @@ public class UserInfoService {
             return Boolean.FALSE;
         }
     }
-
-//    public EssentialUserInfo getUserWithAuthorities(String userEmail) {
-//        return EssentialUserInfo.from(userInfoRepository.findOneWithAuthoritiesByUserEmail(userEmail).orElse(null));
-//    }
-//
-//    //@Transactional(readOnly = true)
-//    public EssentialUserInfo getMyUserWithAuthorities() {
-//        return EssentialUserInfo.from(
-//                SecurityUtil.getCurrentUsername()
-//                        .flatMap(userInfoRepository::findOneWithAuthoritiesByUserEmail)
-//                        .orElseThrow(() -> new NotFoundMemberException("Member not found"))
-//        );
-//    }
 }

@@ -29,7 +29,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.filter.CorsFilter;
 
 @EnableWebSecurity
-//@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
     private final CorsFilter corsFilter;
@@ -50,15 +49,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .cors().and().csrf().disable()
+                .csrf().disable()
                 .formLogin().disable()
                 .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
-
-//                .exceptionHandling()
-//                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
-//                .accessDeniedHandler(jwtAccessDeniedHandler)
-
-//              .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
@@ -84,9 +77,7 @@ public class SecurityConfig {
 
                 .antMatchers("/api/commentUpload").access("hasAnyRole('USER','ADMIN')")
 
-                //.antMatchers("/api/refresh").access("hasAnyRole('USER','ADMIN')")
-
-                //.anyRequest().permitAll()
+                .anyRequest().authenticated()
 
                 .and()
                 .apply(new JwtSecurityConfig(jwtTokenProvider));

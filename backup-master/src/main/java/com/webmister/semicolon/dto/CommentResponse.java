@@ -14,7 +14,6 @@ public class CommentResponse {
     private String nickname;
     private Long postsId;
 
-
     public CommentResponse(Comment comment)
     {
         this.id = comment.getId();

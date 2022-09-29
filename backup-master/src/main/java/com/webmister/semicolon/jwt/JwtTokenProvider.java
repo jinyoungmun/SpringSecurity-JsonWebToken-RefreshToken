@@ -1,33 +1,22 @@
 package com.webmister.semicolon.jwt;
 
-import com.webmister.semicolon.domain.Authority;
-import com.webmister.semicolon.domain.UserInfo;
 import com.webmister.semicolon.dto.TokenDto;
-import com.webmister.semicolon.repository.AuthorityRepository;
-import com.webmister.semicolon.repository.UserInfoRepository;
-import com.webmister.semicolon.request.UserInfoRequest;
-import com.webmister.semicolon.service.UserInfoService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.token.Token;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.stream.Collectors;
 
@@ -39,23 +28,16 @@ public class JwtTokenProvider implements InitializingBean {
     private final String secret;
     private final long accessTokenValidityInMilliseconds;
     private final long refreshTokenValidityInMilliseconds;
-    private final UserInfoRepository userInfoRepository;
-    private final AuthorityRepository authorityRepository;
     private Key key;
 
     public JwtTokenProvider(
             @Value("${jwt.secret}") String secret,
             @Value("${jwt.access-token-validity-in-seconds}") long accessTokenValidityInSeconds,
-            @Value("${jwt.refresh-token-validity-in-seconds}") long refreshTokenValidityInSeconds,
-            UserInfoRepository userInfoRepository,
-            AuthorityRepository authorityRepository
-
+            @Value("${jwt.refresh-token-validity-in-seconds}") long refreshTokenValidityInSeconds
     ){
         this.secret = secret;
         this.accessTokenValidityInMilliseconds = accessTokenValidityInSeconds * 1000;
         this.refreshTokenValidityInMilliseconds = refreshTokenValidityInSeconds * 1000;
-        this.userInfoRepository = userInfoRepository;
-        this.authorityRepository = authorityRepository;
     }
 
     @Override
@@ -123,34 +105,7 @@ public class JwtTokenProvider implements InitializingBean {
         return false;
     }
 
-//    public boolean validateRefreshToken(RefreshToken refreshTokenObj){
-//
-//        String refreshToken = refreshTokenObj.getRefreshToken();
-//
-//        try{
-//            Jws.parserBuilder().setSigningKey(key).build().parseClaimsJws(refreshToken);
-//            if(!Jws.claims().getExpiration().before(new Date())){
-//                return reCreateToken();
-//            }
-//            return true;
-//        }
-//        catch(SignatureException | MalformedJwtException e){
-//            // 서명 오류, JWT 구조 문제
-//            log.info("");
-//        }
-//        catch (ExpiredJwtException e){
-//            log.info("재로그인 필요");
-//        }
-//        catch (Exception e){
-//            // 그 이외의 오류
-//        }
-//        return false; // false면 401에러.
-//    }
-
     public Boolean validateRefreshToken(String refreshToken){
-
-        //String refreshToken = refreshTokenObj.getRefreshToken();
-
         try{
             Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(refreshToken);
             // refresh 토큰 만료가 안됬으면 새로운 access 토큰 생성.

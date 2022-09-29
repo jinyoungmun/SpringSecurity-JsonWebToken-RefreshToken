@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 public class EssentialUserInfo {
 
     String password;
+    String decodedPassword;
     String userEmail;
     String userNickName;
     String userUniqueId;
@@ -23,6 +24,7 @@ public class EssentialUserInfo {
 
         this.userEmail = getUserEmail();
         this.password = getPassword();
+        this.decodedPassword = getDecodedPassword();
         this.userNickName = getUserNickName();
         this.userUniqueId = getUserUniqueId();
 

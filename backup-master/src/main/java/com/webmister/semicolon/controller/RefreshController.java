@@ -5,12 +5,9 @@ import com.webmister.semicolon.dto.TokenDto;
 import com.webmister.semicolon.jwt.JwtFilter;
 import com.webmister.semicolon.jwt.JwtTokenProvider;
 import com.webmister.semicolon.repository.UserInfoRepository;
-import com.webmister.semicolon.request.Login;
-import com.webmister.semicolon.request.RefreshApiResponseMessage;
 import com.webmister.semicolon.request.UserInfoRequest;
 import com.webmister.semicolon.service.JwtService;
 import com.webmister.semicolon.service.UserInfoService;
-import io.jsonwebtoken.Jwt;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -19,13 +16,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.token.Token;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
@@ -52,31 +46,6 @@ public class RefreshController {
         this.authenticationManagerBuilder = authenticationManagerBuilder;
     }
 
-//    @RequestMapping(value = "/refresh",
-//            method = {RequestMethod.GET, RequestMethod.POST}
-//    )
-//    public ResponseEntity<RefreshApiResponseMessage> validateRefreshToken(@RequestBody HashMap<String, String> bodyJson){
-//
-//
-//        Map<String, String> map = jwtService.validateRefreshToken(bodyJson.get("refreshToken"));
-//
-//        HttpHeaders resHeaders = new HttpHeaders();
-//        resHeaders.add("Content-Type", "application/json;charset=UTF-8");
-//
-//
-//        if(map.get("status").equals("401")){
-//            log.info("RefreshToken 만료");
-//            RefreshApiResponseMessage refreshApiResponseMessage = new RefreshApiResponseMessage(map);
-//            //HttpStatus.UNAUTHORIZED == 401 error
-//            return new ResponseEntity<>(refreshApiResponseMessage, resHeaders, HttpStatus.UNAUTHORIZED);
-//        }
-//
-//        log.info("RefreshToken 유효");
-//        RefreshApiResponseMessage refreshApiResponseMessage = new RefreshApiResponseMessage(map);
-//        return new ResponseEntity<>(refreshApiResponseMessage, resHeaders, HttpStatus.OK);
-//
-//    }
-
     @RequestMapping(value = "/refresh/{userNickName}",
             method = {RequestMethod.GET, RequestMethod.POST}
     )
@@ -84,19 +53,16 @@ public class RefreshController {
 
         UserInfo userInfo = userInfoService.findUserInfoByUserNickName(userNickName);
 
-        //jwtService.getRole(userInfo.getUserNickName());
+        UserInfoRequest userInfoRequest = new UserInfoRequest();
+
+        jwtService.requestSave(userInfoRequest, userInfo);
+        jwtService.roleSetUp(userInfoRequest, userInfo);
 
         UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(userInfo.getUserEmail(), userInfo.getPassword());
+                new UsernamePasswordAuthenticationToken(userInfo.getUserEmail(), userInfo.getDecodedPassword());
 
-        log.info("1");
-        //Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-
-        /*
-        log.info("2");
+        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
-
-         */
 
         String refreshToken = jwtService.findRefreshToken(userInfo.getUserEmail());
 
@@ -106,16 +72,16 @@ public class RefreshController {
         HttpHeaders resHeaders = new HttpHeaders();
         resHeaders.add("Content-Type", "application/json;charset=UTF-8");
 
-        if(status == true) {
+        if(status) {
 
-            TokenDto jwt = jwtTokenProvider.reCreateToken(authenticationToken);
+            TokenDto jwt = jwtTokenProvider.reCreateToken(authentication);
 
             resHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + jwt.getAccessToken());
 
             return new ResponseEntity<>(jwt, resHeaders, HttpStatus.OK);
         }
 
-        return new ResponseEntity<>(null, resHeaders, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(null, resHeaders, HttpStatus.UNAUTHORIZED);
 
     }
 }
