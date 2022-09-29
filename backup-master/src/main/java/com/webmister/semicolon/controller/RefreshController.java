@@ -67,7 +67,6 @@ public class RefreshController {
         String refreshToken = jwtService.findRefreshToken(userInfo.getUserEmail());
 
         Boolean status = jwtTokenProvider.validateRefreshToken(refreshToken);
-        log.info(refreshToken);
 
         HttpHeaders resHeaders = new HttpHeaders();
         resHeaders.add("Content-Type", "application/json;charset=UTF-8");

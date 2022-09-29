@@ -138,6 +138,8 @@ public class JwtTokenProvider implements InitializingBean {
                 .setExpiration(validity)
                 .compact();
 
+        log.info(accessToken);
+
         return TokenDto.builder().accessToken(accessToken).build();
     }
 }

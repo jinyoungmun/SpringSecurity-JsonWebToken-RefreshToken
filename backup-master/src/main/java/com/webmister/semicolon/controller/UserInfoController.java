@@ -83,9 +83,7 @@ public class UserInfoController {
         userInfoService.login(login);
 
         UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(login.getUserEmail(), login.getPassword()); //1234
-
-        log.info(login.getPassword());
+                new UsernamePasswordAuthenticationToken(login.getUserEmail(), login.getPassword());
 
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
