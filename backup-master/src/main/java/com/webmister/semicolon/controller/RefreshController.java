@@ -75,7 +75,7 @@ public class RefreshController {
 
             TokenDto jwt = jwtTokenProvider.reCreateToken(authentication);
 
-            resHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + jwt.getAccessToken());
+            resHeaders.add(JwtFilter.AUTHORIZATION_HEADER, jwt.getAccessToken());
 
             return new ResponseEntity<>(jwt, resHeaders, HttpStatus.OK);
         }

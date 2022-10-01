@@ -59,9 +59,9 @@ public class SecurityConfig {
                 .authorizeRequests()
                 .antMatchers("/api/signUp").permitAll()
                 .antMatchers("/api/login").permitAll()
-                .antMatchers("/api/printAll").permitAll()
                 .antMatchers("/api/get").permitAll()
                 .antMatchers("/api/refresh/{userNickName}").permitAll()
+                .antMatchers("/api/printAll").access("hasAnyRole('ADMIN')")
                 .antMatchers("/api/{userNickname}").access("hasAnyRole('USER','ADMIN')")
                 .antMatchers("api/userDelete/{userNickName}").access("hasAnyRole('USER','ADMIN')")
 
