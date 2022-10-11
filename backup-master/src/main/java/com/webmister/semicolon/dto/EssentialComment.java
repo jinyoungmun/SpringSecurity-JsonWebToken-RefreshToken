@@ -1,26 +1,33 @@
 package com.webmister.semicolon.dto;
 
 import com.webmister.semicolon.domain.Comment;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Data
-public class CommentResponse {
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class EssentialComment {
     private Long id;
     private String comment;
     private LocalDateTime commentCreatedTime;
     private LocalDateTime commentUpdateTime;
     private String nickname;
-    private Long postsId;
+    private Long reportId;
 
-    public CommentResponse(Comment comment)
+
+    public EssentialComment(Comment comment)
     {
-        this.id = comment.getId();
+        this.id = comment.getCommentId();
         this.comment = comment.getComment();
         this.commentCreatedTime = comment.getCommentCreateTime();
         this.commentUpdateTime = comment.getCommentUpdateTime();
-        this.nickname = comment.getUserInfo().getUserNickName();
-        this.postsId = comment.getReport().getId();
+        this.nickname = comment.getUserInfo().getUserNickname();
+        this.reportId = comment.getReport().getReportId();
     }
 }

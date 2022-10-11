@@ -4,10 +4,10 @@ import com.webmister.semicolon.domain.UserInfo;
 import com.webmister.semicolon.dto.TokenDto;
 import com.webmister.semicolon.jwt.JwtFilter;
 import com.webmister.semicolon.jwt.JwtTokenProvider;
-import com.webmister.semicolon.response.FindUserOnlyOneResponse;
+import com.webmister.semicolon.request.FindUserOnlyOneRequest;
 import com.webmister.semicolon.request.Login;
 import com.webmister.semicolon.request.UserInfoRequest;
-import com.webmister.semicolon.request.FindUserOnlyOneRequest;
+import com.webmister.semicolon.response.FindUserOnlyOneResponse;
 import com.webmister.semicolon.service.JwtService;
 import com.webmister.semicolon.service.UserInfoService;
 import lombok.extern.slf4j.Slf4j;
@@ -100,12 +100,12 @@ public class UserInfoController {
     }
 
 
-    @RequestMapping(value = "/{userNickName}",
+    @RequestMapping(value = "/{userNickname}",
             method = {RequestMethod.GET, RequestMethod.POST}
     )
-    public ResponseEntity<UserInfo> createUser(@PathVariable("userNickName") String userNickName){
+    public ResponseEntity<UserInfo> createUser(@PathVariable("userNickname") String userNickname){
 
-        UserInfo user1 = userInfoService.findUserInfoByUserNickName(userNickName);
+        UserInfo user1 = userInfoService.findUserInfoByUserNickname(userNickname);
         log.debug(String.valueOf(user1));
         HttpHeaders resHeaders = new HttpHeaders();
         resHeaders.add("Content-Type", "application/json;charset=UTF-8");
@@ -118,10 +118,21 @@ public class UserInfoController {
         resHeaders.add("Content-Type", "application/json;charset=UTF-8");
 
         try {
-            if (!userInfoService.checkDuplicateUserNickname(userInfoRequest.getUserNickName()))
-                if(!userInfoService.checkDuplicateEmail(userInfoRequest.getUserEmail()))
-                    userInfoService.signUp(userInfoRequest);
+            if (!userInfoService.checkDuplicateUserNickname(userInfoRequest.getUserNickname()) & !userInfoService.checkDuplicateEmail(userInfoRequest.getUserEmail()))
+                userInfoService.signUp(userInfoRequest);
         } catch (Exception e) {
+            return new ResponseEntity<>(Boolean.FALSE, resHeaders, HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(Boolean.TRUE, resHeaders, HttpStatus.OK);
+    }
+    @DeleteMapping("/userDelete/{userNickname}")
+    public ResponseEntity<Boolean> userDelete(@PathVariable("userNickname")String userNickname){
+        HttpHeaders resHeaders = new HttpHeaders();
+        resHeaders.add("Content-Type", "application/json;charset=UTF-8");
+
+        try {
+            userInfoService.deleteUser(userNickname);
+        }catch (Exception e){
             return new ResponseEntity<>(Boolean.FALSE, resHeaders, HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(Boolean.TRUE, resHeaders, HttpStatus.OK);

@@ -6,7 +6,5 @@ import lombok.Data;
 public class UploadRequest {
     String title;
     String contents;
-    int likeCount;
     String reportImageUrl;
-
 }

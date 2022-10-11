@@ -1,9 +1,9 @@
 package com.webmister.semicolon.request;
 
 
-import lombok.Getter;
+import lombok.Data;
 
-@Getter
+@Data
 public class Login {
     String userEmail;
     String password;

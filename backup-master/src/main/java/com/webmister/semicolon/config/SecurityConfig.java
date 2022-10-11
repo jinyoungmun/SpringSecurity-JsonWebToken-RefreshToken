@@ -60,19 +60,19 @@ public class SecurityConfig {
                 .antMatchers("/api/signUp").permitAll()
                 .antMatchers("/api/login").permitAll()
                 .antMatchers("/api/get").permitAll()
-                .antMatchers("/api/refresh/{userNickName}").permitAll()
+                .antMatchers("/api/refresh/{userNickname}").permitAll()
                 .antMatchers("/api/printAll").access("hasAnyRole('ADMIN')")
                 .antMatchers("/api/{userNickname}").access("hasAnyRole('USER','ADMIN')")
-                .antMatchers("api/userDelete/{userNickName}").access("hasAnyRole('USER','ADMIN')")
+                .antMatchers("api/userDelete/{userNickname}").access("hasAnyRole('USER','ADMIN')")
 
-                .antMatchers("/api/{userNickname}/reportUpload").access("hasAnyRole('USER','ADMIN')")
+                .antMatchers("/api/{departStatus}/{userNickname}/reportUpload").access("hasAnyRole('USER','ADMIN')")
                 .antMatchers("/api/{userNickname}/{reportId}").access("hasAnyRole('USER','ADMIN')")
                 .antMatchers("/api/{userNickname}/reportDelete").access("hasAnyRole('USER','ADMIN')")
 
                 .antMatchers("/api/{userNickname}/profileImageUp").access("hasAnyRole('USER','ADMIN')")
 
                 .antMatchers("/api/friend/friendMatch/{postFriendNickname}").access("hasAnyRole('USER','ADMIN')")
-                .antMatchers("/api/friend/printAll/{userNickName}").access("hasAnyRole('USER','ADMIN')")
+                .antMatchers("/api/friend/printAll/{userNickname}").access("hasAnyRole('USER','ADMIN')")
                 .antMatchers("/api/friend/friendDelete/{postFriendNickname}").access("hasAnyRole('USER','ADMIN')")
 
                 .antMatchers("/api/commentUpload").access("hasAnyRole('USER','ADMIN')")

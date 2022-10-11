@@ -51,7 +51,7 @@ public class RefreshController {
     )
     public ResponseEntity<TokenDto> validateRefreshToken(@PathVariable("userNickName") String userNickName){
 
-        UserInfo userInfo = userInfoService.findUserInfoByUserNickName(userNickName);
+        UserInfo userInfo = userInfoService.findUserInfoByUserNickname(userNickName);
 
         UserInfoRequest userInfoRequest = new UserInfoRequest();
 

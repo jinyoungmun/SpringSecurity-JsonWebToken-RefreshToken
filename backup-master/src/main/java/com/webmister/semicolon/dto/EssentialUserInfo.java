@@ -12,7 +12,7 @@ public class EssentialUserInfo {
     String password;
     String decodedPassword;
     String userEmail;
-    String userNickName;
+    String userNickname;
     String userUniqueId;
     String userProfileImageUrl;
     String userDescription;
@@ -25,11 +25,9 @@ public class EssentialUserInfo {
         this.userEmail = getUserEmail();
         this.password = getPassword();
         this.decodedPassword = getDecodedPassword();
-        this.userNickName = getUserNickName();
+        this.userNickname = getUserNickname();
         this.userUniqueId = getUserUniqueId();
 
-        //.map(authority -> AuthorityDto.builder().authorityName(authority.getAuthorityName()).build()); ↓
-        //this.comments = report.getComments().stream().map(CommentResponse::new).collect(Collectors.toList());
 
         if (userInfo.getUserProfileImageUrl() != null) {
             this.userProfileImageUrl = userInfo.getUserProfileImageUrl();

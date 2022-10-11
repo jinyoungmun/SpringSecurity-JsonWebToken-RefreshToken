@@ -14,12 +14,6 @@ spring:
     add-mapping : true
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration
-
-#  servlet:
-#    multipart:
-#      location: Users/Desktop/imageFile
-#      maxFileSize: 200MB
-#      maxRequestSize: 200MB
   jpa:
     database: mysql
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect

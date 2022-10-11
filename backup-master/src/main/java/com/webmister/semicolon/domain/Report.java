@@ -1,14 +1,17 @@
 package com.webmister.semicolon.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import lombok.*;
+import com.webmister.semicolon.enumclass.DepartStatus;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Data
 @Builder
 @Getter
 @AllArgsConstructor
@@ -16,9 +19,9 @@ import java.util.List;
 public class Report {
 
     @Id
-    @Column(name = "report_id")
+    @Column(name = "reportId")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    Long reportId;
 
     @Column
     private String reportImageUrl;
@@ -39,8 +42,12 @@ public class Report {
     private LocalDateTime reportUpdateTime;
 
     @OneToMany(mappedBy = "report",fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
-    @OrderBy("id asc") //댓글 정렬
+    @OrderBy("commentId asc") //댓글 정렬
     private List<Comment> comments;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private DepartStatus userDepartStatus;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userInfoId")
@@ -48,10 +55,12 @@ public class Report {
     private UserInfo userInfo;
 
 
+
     public void update(String title, String contents) {
         this.title = title;
         this.contents = contents;
     }
+
 
     @PrePersist
     public void ReportCreatedDate() {

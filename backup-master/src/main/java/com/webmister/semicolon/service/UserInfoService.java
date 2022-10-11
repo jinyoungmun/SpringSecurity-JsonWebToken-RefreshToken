@@ -36,8 +36,8 @@ public class UserInfoService {
         return userInfoRepository.findById(id).orElse(new UserInfo());
     }
 
-    public UserInfo findUserInfoByUserNickName(String userNickName){
-        return userInfoRepository.findUserInfoByUserNickName(userNickName).orElse(new UserInfo());
+    public UserInfo findUserInfoByUserNickname(String userNickname){
+        return userInfoRepository.findUserInfoByUserNickname(userNickname);
     }
 
     public List<UserInfo> findAll(){
@@ -51,7 +51,7 @@ public class UserInfoService {
     }
 
     public boolean checkDuplicateUserNickname(String userNickname) {
-        return userInfoRepository.existsByUserNickName(userNickname);
+        return userInfoRepository.existsByUserNickname(userNickname);
     }
 
     public UserInfo login(Login login) {
@@ -71,13 +71,13 @@ public class UserInfoService {
 
             log.info("리프레시 저장");
             log.info(userInfo.getRefreshToken());
-            return Boolean.TRUE;
 
         }catch (Exception e){
 
             log.info("리프레시 실패");
             return Boolean.FALSE;
         }
+        return Boolean.TRUE;
     }
 
     public UserInfo updatePasswordService(String email, String password) {
@@ -95,7 +95,7 @@ public class UserInfoService {
                     .password(passwordEncoder.encode(userInfoRequest.getPassword()))
                     .decodedPassword(userInfoRequest.getPassword())
                     .userEmail(userInfoRequest.getUserEmail())
-                    .userNickName(userInfoRequest.getUserNickName())
+                    .userNickname(userInfoRequest.getUserNickname())
                     .userUniqueID(UserStatus.USER)
                     .userProfileImageUrl(userInfoRequest.getUserProfileImageUrl())
                     .userDescription(userInfoRequest.getUserDescription())
@@ -105,10 +105,19 @@ public class UserInfoService {
                     .build());
 
             log.info("서비스 회갑");
-            return Boolean.TRUE;
         } catch (Exception e) {
             log.info("서비스 회갑 실패");
             return Boolean.FALSE;
         }
+        return Boolean.TRUE;
+    }
+
+    public Boolean deleteUser(String userNickname){
+        try{
+            userInfoRepository.deleteById(userInfoRepository.findByUserNickname(userNickname).getUserInfoId());
+        }catch (Exception e){
+            return Boolean.FALSE;
+        }
+        return Boolean.TRUE;
     }
 }

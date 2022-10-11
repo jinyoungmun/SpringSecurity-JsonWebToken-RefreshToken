@@ -14,25 +14,25 @@ import java.time.LocalDateTime;
 public class Comment {
 
     @Id
-    @Column(name = "comment_id")
+    @Column(name = "commentId")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    Long commentId;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String comment;
 
-    @Column(name = "created_date")
+    @Column(name = "createdDate")
     private LocalDateTime commentCreateTime;
 
-    @Column(name = "update_date")
+    @Column(name = "updateDate")
     private LocalDateTime commentUpdateTime;
 
     @ManyToOne
-    @JoinColumn(name = "report_id")
+    @JoinColumn(name = "reportId")
     private Report report;
 
     @ManyToOne
-    @JoinColumn(name = "userInfo_id")
+    @JoinColumn(name = "userInfoId")
     private UserInfo userInfo;
 
     @PrePersist
