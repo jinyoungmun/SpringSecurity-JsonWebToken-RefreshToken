@@ -58,7 +58,7 @@ public class JwtService {
     public UserInfoRequest requestSave(UserInfoRequest userInfoRequest, UserInfo userInfo){
         userInfoRequest.setUserEmail(userInfo.getUserEmail());
         userInfoRequest.setDecodedPassword(userInfo.getDecodedPassword());
-        userInfoRequest.setUserNickname(userInfo.getUserNickname());
+        userInfoRequest.setUserNickname(userInfo.getUserNickName());
         userInfoRequest.setUserStatus(userInfo.getUserUniqueID());
         userInfoRequest.setUserProfileImageUrl(userInfo.getUserProfileImageUrl());
         userInfoRequest.setUserDescription(userInfo.getUserDescription());
@@ -74,7 +74,7 @@ public class JwtService {
             userInfoRepository.save(UserInfo.builder()
                     .password(passwordEncoder.encode(userInfoRequest.getPassword()))
                     .userEmail(userInfoRequest.getUserEmail())
-                    .userNickname(userInfoRequest.getUserNickname())
+                    .userNickName(userInfoRequest.getUserNickname())
                     .userUniqueID(UserStatus.USER)
                     .userProfileImageUrl(userInfoRequest.getUserProfileImageUrl())
                     .userDescription(userInfoRequest.getUserDescription())

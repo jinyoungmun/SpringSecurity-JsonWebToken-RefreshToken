@@ -32,8 +32,8 @@ public class FriendMatchService {
     }
 
     public FriendMatchResponse FriendMatchSave(String userInfoNickname, FriendMatchRequest friendMatchRequest){
-            UserInfo postFriend = userInfoRepository.findUserInfoByUserNickname(userInfoNickname);
-            UserInfo receiveFriend = userInfoRepository.findUserInfoByUserNickname(friendMatchRequest.getReceiveFriendNickname());
+            UserInfo postFriend = userInfoRepository.findUserInfoByUserNickName(userInfoNickname);
+            UserInfo receiveFriend = userInfoRepository.findUserInfoByUserNickName(friendMatchRequest.getReceiveFriendNickname());
             FriendStatus friendStatus = friendMatchRequest.getFriendStatus();
             FriendMatchResponse friendMatchResponse = new FriendMatchResponse();
             try {
@@ -42,7 +42,7 @@ public class FriendMatchService {
                         .receiveFriendId(receiveFriend)
                         .friendStatus(friendStatus)
                         .build());
-                friendMatchResponseSave(friendMatchResponse, userInfoNickname, receiveFriend.getUserNickname(), friendStatus);
+                friendMatchResponseSave(friendMatchResponse, userInfoNickname, receiveFriend.getUserNickName(), friendStatus);
             }catch (Exception e){
                 return new FriendMatchResponse();
             }
@@ -50,8 +50,8 @@ public class FriendMatchService {
     }
 
     public Boolean FriendMatchDelete(String userInfoNickname, FriendMatchRequest friendMatchRequest){
-        UserInfo postFriend = userInfoRepository.findUserInfoByUserNickname(userInfoNickname);
-        UserInfo receiveFriend = userInfoRepository.findUserInfoByUserNickname(friendMatchRequest.getReceiveFriendNickname());
+        UserInfo postFriend = userInfoRepository.findUserInfoByUserNickName(userInfoNickname);
+        UserInfo receiveFriend = userInfoRepository.findUserInfoByUserNickName(friendMatchRequest.getReceiveFriendNickname());
         FriendStatus friendStatus = friendMatchRequest.getFriendStatus();
         try {
             if (friendStatus == FriendStatus.UNFOLLOW) {
@@ -65,7 +65,7 @@ public class FriendMatchService {
     }
 
     public List<FriendMatch> FriendList(String userNickname){
-        List<FriendMatch> friendMatchList = userInfoRepository.findUserInfoByUserNickname(userNickname).getFriendMatchList();
+        List<FriendMatch> friendMatchList = userInfoRepository.findUserInfoByUserNickName(userNickname).getFriendMatchList();
         return friendMatchList;
     }
 

@@ -46,12 +46,12 @@ public class RefreshController {
         this.authenticationManagerBuilder = authenticationManagerBuilder;
     }
 
-    @RequestMapping(value = "/refresh/{userNickName}",
+    @RequestMapping(value = "/refresh/{userNickname}",
             method = {RequestMethod.GET, RequestMethod.POST}
     )
-    public ResponseEntity<TokenDto> validateRefreshToken(@PathVariable("userNickName") String userNickName){
+    public ResponseEntity<TokenDto> validateRefreshToken(@PathVariable("userNickname") String userNickname){
 
-        UserInfo userInfo = userInfoService.findUserInfoByUserNickname(userNickName);
+        UserInfo userInfo = userInfoService.findUserInfoByUserNickname(userNickname);
 
         UserInfoRequest userInfoRequest = new UserInfoRequest();
 

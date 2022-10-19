@@ -59,6 +59,11 @@ ReportService {
         return report1;
     }
 
+    public List<Report> findDepartAll(DepartStatus departStatus){
+
+        return reportRepository.findAllByUserDepartStatus(departStatus).orElseThrow();
+    }
+
     public Boolean deleteReport(DeleteReportRequest reportId, Long userId, DepartStatus departStatus){
         List<Report> reportList = userInfoRepository.findById(userId).get().getReportList();
         for(Report report : reportList) {

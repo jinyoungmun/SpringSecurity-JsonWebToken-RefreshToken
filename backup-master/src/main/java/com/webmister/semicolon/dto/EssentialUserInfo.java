@@ -12,7 +12,7 @@ public class EssentialUserInfo {
     String password;
     String decodedPassword;
     String userEmail;
-    String userNickname;
+    String userNickName;
     String userUniqueId;
     String userProfileImageUrl;
     String userDescription;
@@ -25,7 +25,7 @@ public class EssentialUserInfo {
         this.userEmail = getUserEmail();
         this.password = getPassword();
         this.decodedPassword = getDecodedPassword();
-        this.userNickname = getUserNickname();
+        this.userNickName = getUserNickName();
         this.userUniqueId = getUserUniqueId();
 
 

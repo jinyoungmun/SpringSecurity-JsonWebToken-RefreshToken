@@ -34,7 +34,7 @@ public class UserInfo {
     private String decodedPassword;
 
     @Column(nullable = false)
-    private String userNickname;
+    private String userNickName;
 
     @Column(nullable = false)
     private LocalDateTime userInfoCreateDate;
@@ -54,6 +54,13 @@ public class UserInfo {
 
     @Column
     private String refreshToken;
+
+    @Column
+    private String userEmailAuthKey;
+
+    @Column
+    private Boolean userEmailAuthState;
+
 
     @OneToMany(mappedBy = "userInfo", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     private List<Report> reportList = new ArrayList<Report>();

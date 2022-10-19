@@ -1,6 +1,6 @@
 server:
   address: 0.0.0.0
-  port: 8080
+  port: 8081
 
 spring:
   datasource:
@@ -14,6 +14,17 @@ spring:
     add-mapping : true
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration
+  mail:
+    host: smtp.naver.com
+    port: 465
+    username: example01@naver.com
+    password: example01
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl.enable: true
+          ssl.truth: smtp.naver.com
   jpa:
     database: mysql
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
@@ -24,9 +35,6 @@ spring:
 
 jwt:
   header: Authorization
-  #https://www.javainuse.com/jwtgenerator
-  #HS512 알고리즘을 사용할 것이기 때문에 512bit, 즉 64byte 이상의 secret key를 사용해야 한다.
-  #secret: 'webmister-semicolon-jwt-secret'|base64
   secret: c2lsdmVybmluZS10ZWNoLXNwcmluZy1ib290LWp3dC10dXRvcmlhbC1zZWNyZXQtc2lsdmVybmluZS10ZWNoLXNwcmluZy1ib290LWp3dC10dXRvcmlhbC1zZWNyZXQK
   access-token-validity-in-seconds: 86400 #하루
   refresh-token-validity-in-seconds: 604800 #일주일

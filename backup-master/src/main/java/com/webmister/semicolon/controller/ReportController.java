@@ -14,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api")
 public class ReportController {
@@ -54,6 +56,17 @@ public class ReportController {
         HttpHeaders resHeaders = new HttpHeaders();
         resHeaders.add("Content-Type", "application/json;charset=UTF-8");
         return new ResponseEntity<>(findReportOnlyOneResponse ,resHeaders,  HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/{departStatus}/showAll",
+            method = {RequestMethod.GET, RequestMethod.POST}
+    )public ResponseEntity<List<Report>> findDepartAll(@PathVariable("departStatus") DepartStatus departStatus){
+
+        List<Report> showDepartReport = reportService.findDepartAll(departStatus);
+
+        HttpHeaders resHeaders = new HttpHeaders();
+        resHeaders.add("Content-Type", "application/json;charset=UTF-8");
+        return new ResponseEntity<>(showDepartReport, resHeaders,  HttpStatus.OK);
     }
 
     @DeleteMapping("/{departStatus}/{userNickname}/reportDelete")

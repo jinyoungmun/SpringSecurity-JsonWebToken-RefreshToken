@@ -27,7 +27,7 @@ public class EssentialComment {
         this.comment = comment.getComment();
         this.commentCreatedTime = comment.getCommentCreateTime();
         this.commentUpdateTime = comment.getCommentUpdateTime();
-        this.nickname = comment.getUserInfo().getUserNickname();
+        this.nickname = comment.getUserInfo().getUserNickName();
         this.reportId = comment.getReport().getReportId();
     }
 }

@@ -89,23 +89,20 @@ public class JwtTokenProvider implements InitializingBean {
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }
 
-    public Boolean validateToken(String token) {
+    public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+            return true;
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
             log.info("잘못된 JWT 서명입니다.");
-            return Boolean.FALSE;
         } catch (ExpiredJwtException e) {
             log.info("만료된 JWT 토큰입니다.");
-            return Boolean.FALSE;
         } catch (UnsupportedJwtException e) {
             log.info("지원되지 않는 JWT 토큰입니다.");
-            return Boolean.FALSE;
         } catch (IllegalArgumentException e) {
             log.info("JWT 토큰이 잘못되었습니다.");
-            return Boolean.FALSE;
         }
-        return Boolean.TRUE;
+        return false;
     }
 
     public Boolean validateRefreshToken(String refreshToken){
@@ -115,13 +112,13 @@ public class JwtTokenProvider implements InitializingBean {
             if(!claims.getBody().getExpiration().before(new Date())){
             log.info("액세스 토큰 재생성");
             }
+            return Boolean.TRUE;
         }
         catch (Exception e){
             // refresh 토큰이 만료된 경우, 로그인이 필요.
             log.info("재로그인 필요");
             return Boolean.FALSE;
         }
-        return Boolean.TRUE;
     }
 
     //refresh 유효성 검사 거치고 accessToken 새로 발급하는 메서드.

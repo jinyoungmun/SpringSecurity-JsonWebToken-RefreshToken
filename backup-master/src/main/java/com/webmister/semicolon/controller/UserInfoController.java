@@ -9,6 +9,7 @@ import com.webmister.semicolon.request.Login;
 import com.webmister.semicolon.request.UserInfoRequest;
 import com.webmister.semicolon.response.FindUserOnlyOneResponse;
 import com.webmister.semicolon.service.JwtService;
+import com.webmister.semicolon.service.MailService;
 import com.webmister.semicolon.service.UserInfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -31,17 +32,20 @@ public class UserInfoController {
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtService jwtService;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final MailService mailService;
 
     public UserInfoController(
             UserInfoService userInfoService,
             JwtTokenProvider jwtTokenProvider,
             JwtService jwtService,
-            AuthenticationManagerBuilder authenticationManagerBuilder
+            AuthenticationManagerBuilder authenticationManagerBuilder,
+            MailService mailService
     ) {
         this.userInfoService = userInfoService;
         this.jwtTokenProvider = jwtTokenProvider;
         this.jwtService = jwtService;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
+        this.mailService = mailService;
     }
 
     @RequestMapping(value = "/printAll",
@@ -100,12 +104,12 @@ public class UserInfoController {
     }
 
 
-    @RequestMapping(value = "/{userNickname}",
+    @RequestMapping(value = "/{userNickName}",
             method = {RequestMethod.GET, RequestMethod.POST}
     )
-    public ResponseEntity<UserInfo> createUser(@PathVariable("userNickname") String userNickname){
+    public ResponseEntity<UserInfo> createUser(@PathVariable("userNickName") String userNickName){
 
-        UserInfo user1 = userInfoService.findUserInfoByUserNickname(userNickname);
+        UserInfo user1 = userInfoService.findUserInfoByUserNickname(userNickName);
         log.debug(String.valueOf(user1));
         HttpHeaders resHeaders = new HttpHeaders();
         resHeaders.add("Content-Type", "application/json;charset=UTF-8");
@@ -120,6 +124,7 @@ public class UserInfoController {
         try {
             if (!userInfoService.checkDuplicateUserNickname(userInfoRequest.getUserNickname()) & !userInfoService.checkDuplicateEmail(userInfoRequest.getUserEmail()))
                 userInfoService.signUp(userInfoRequest);
+            mailService.mailSend(userInfoRequest.getUserEmail(),userInfoService.findByUserEmail(userInfoRequest.getUserEmail()).getUserEmailAuthKey());
         } catch (Exception e) {
             return new ResponseEntity<>(Boolean.FALSE, resHeaders, HttpStatus.BAD_REQUEST);
         }

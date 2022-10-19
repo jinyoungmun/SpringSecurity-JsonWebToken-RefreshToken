@@ -10,7 +10,7 @@ import java.util.Optional;
 @Repository
 public interface UserInfoRepository extends JpaRepository<UserInfo, Long> {
     boolean existsByUserEmail(String email);
-    boolean existsByUserNickname(String userNickname);
+    boolean existsByUserNickName(String nickName);
 
     boolean existsByPassword(String userPassword);
 
@@ -18,11 +18,11 @@ public interface UserInfoRepository extends JpaRepository<UserInfo, Long> {
 
     Optional<UserInfo> findByUserEmail(String email);
 
-    UserInfo findUserInfoByUserNickname(String userNickname);
+    UserInfo findUserInfoByUserNickName(String userNickName);
 
     Optional<UserInfo> findByPassword(String password);
 
-    UserInfo findByUserNickname(String userNickname);
+    UserInfo findByUserNickName(String userNickname);
 
     @EntityGraph(attributePaths = "authorities")
     Optional<UserInfo> findOneWithAuthoritiesByUserEmail(String userEmail);

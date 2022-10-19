@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 @Slf4j
 @Service
@@ -37,7 +38,7 @@ public class UserInfoService {
     }
 
     public UserInfo findUserInfoByUserNickname(String userNickname){
-        return userInfoRepository.findUserInfoByUserNickname(userNickname);
+        return userInfoRepository.findUserInfoByUserNickName(userNickname);
     }
 
     public List<UserInfo> findAll(){
@@ -51,7 +52,7 @@ public class UserInfoService {
     }
 
     public boolean checkDuplicateUserNickname(String userNickname) {
-        return userInfoRepository.existsByUserNickname(userNickname);
+        return userInfoRepository.existsByUserNickName(userNickname);
     }
 
     public UserInfo login(Login login) {
@@ -71,13 +72,13 @@ public class UserInfoService {
 
             log.info("리프레시 저장");
             log.info(userInfo.getRefreshToken());
+            return Boolean.TRUE;
 
         }catch (Exception e){
 
             log.info("리프레시 실패");
             return Boolean.FALSE;
         }
-        return Boolean.TRUE;
     }
 
     public UserInfo updatePasswordService(String email, String password) {
@@ -95,29 +96,54 @@ public class UserInfoService {
                     .password(passwordEncoder.encode(userInfoRequest.getPassword()))
                     .decodedPassword(userInfoRequest.getPassword())
                     .userEmail(userInfoRequest.getUserEmail())
-                    .userNickname(userInfoRequest.getUserNickname())
+                    .userNickName(userInfoRequest.getUserNickname())
                     .userUniqueID(UserStatus.USER)
                     .userProfileImageUrl(userInfoRequest.getUserProfileImageUrl())
                     .userDescription(userInfoRequest.getUserDescription())
                     .refreshToken(userInfoRequest.getRefreshToken())
+                    .userEmailAuthKey(createRandomKey())
                     .authorities(Collections.singleton(authorityRepository.save(Authority.builder().authorityName("ROLE_USER").build())))
                     .activated(true)
                     .build());
 
             log.info("서비스 회갑");
+            return Boolean.TRUE;
         } catch (Exception e) {
             log.info("서비스 회갑 실패");
+            return Boolean.FALSE;
+        }
+    }
+
+    public Boolean deleteUser(String userNickname){
+        try{
+            userInfoRepository.deleteById(userInfoRepository.findByUserNickName(userNickname).getUserInfoId());
+        }catch (Exception e){
             return Boolean.FALSE;
         }
         return Boolean.TRUE;
     }
 
-    public Boolean deleteUser(String userNickname){
-        try{
-            userInfoRepository.deleteById(userInfoRepository.findByUserNickname(userNickname).getUserInfoId());
-        }catch (Exception e){
-            return Boolean.FALSE;
+    public UserInfo findByUserEmail(String userEmail) {
+        return userInfoRepository.findByUserEmail(userEmail).orElse(new UserInfo());
+    }
+
+    public void mailAuthSuccess(String userNickname) {
+        UserInfo userInfo = findUserInfoByUserNickname(userNickname);
+        userInfo.setUserEmailAuthState(true);
+        userInfoRepository.save(userInfo);
+    }
+
+    public String createRandomKey() {
+        Random random = new Random();
+        int creatNumber = 0;
+        String numberToString = "";
+        String resultKey = "";
+
+        for(int i = 0; i < 10; i++) {
+            creatNumber = random.nextInt(9);
+            numberToString = Integer.toString(creatNumber);
+            resultKey += numberToString;
         }
-        return Boolean.TRUE;
+        return resultKey;
     }
 }
